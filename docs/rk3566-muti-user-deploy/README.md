@@ -43,13 +43,15 @@ python docs/rk3566-muti-user-deploy/scripts/check-status.py
 
 ```
 rk3566-muti-user-deploy/
-├── docker-compose.yml      # 容器编排配置
-├── password.xls            # SSH 凭据（不提交Git）
-├── PLAN.md                 # 部署计划与执行记录
-├── README.md               # 本文件
+├── docker-compose.yml          # 容器编排配置
+├── password.xls                # SSH 凭据（不提交Git）
+├── PLAN.md                     # 部署计划与执行记录
+├── README.md                   # 本文件
+├── 会话清理问题分析.md          # Selenium 会话清理方案
 └── scripts/
-    ├── ssh_scp_util.py    # 部署脚本
-    └── check-status.py    # 状态检查脚本
+    ├── ssh_scp_util.py        # 部署脚本
+    ├── check-status.py        # 状态检查脚本
+    └── weread-selenium.init   # 开机启动脚本模板
 ```
 
 ## 常用操作
@@ -57,17 +59,39 @@ rk3566-muti-user-deploy/
 ### 手动启动阅读
 
 ```bash
+# selenium
+cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up -d selenium
+
 # liujl4735
-docker compose up app-1 -d
+cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up app-1 -d
 
 # liujl3016
-docker compose up app-2 -d
+cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user &&  docker compose up app-2 -d
 
 # jpx155
-docker compose up app-3 -d
+cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user &&  docker compose up app-3 -d
 
 # jpx181
-docker compose up app-4 -d
+cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user &&  docker compose up app-4 -d
+```
+
+### 手动停止阅读
+
+```bash
+# selenium
+cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose stop selenium
+
+# liujl4735
+cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user &&  docker compose stop app-1
+
+# liujl3016
+cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user &&  docker compose stop app-2
+
+# jpx155
+cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose stop app-3
+
+# jpx181
+cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user &&  docker compose stop app-4
 ```
 
 ### 查看日志
@@ -98,6 +122,15 @@ python docs/rk3566-muti-user-deploy/scripts/ssh_scp_util.py
 2. **首次登录**：每个账号首次需手动扫码，后续自动保持登录状态
 3. **阅读时长**：每次阅读68分钟，每日4次
 4. **定时任务**：由 crontab 管理，可通过 `crontab -l` 查看
+5. **会话清理**：定时任务自动重启 Selenium 容器清理浏览器会话，详见[会话清理问题分析.md](会话清理问题分析.md)
+
+## 相关文档
+
+- [PLAN.md](PLAN.md) - 部署计划、技术方案与执行记录
+- [会话清理问题分析.md](会话清理问题分析.md) - Selenium 4.x 会话清理方案
+- [scripts/ssh_scp_util.py](scripts/ssh_scp_util.py) - 自动化部署脚本
+- [scripts/check-status.py](scripts/check-status.py) - 状态检查脚本
+- [scripts/weread-selenium.init](scripts/weread-selenium.init) - 开机启动脚本模板
 
 ## 故障排查
 

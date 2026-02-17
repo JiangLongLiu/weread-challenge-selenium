@@ -158,6 +158,7 @@ services:
 **经验总结：**
 - 无人值守部署：通过 pandas 读取 Excel 密码，paramiko 实现 SSH 免交互
 - 定时任务管理：每个用户4个任务，共16个，通过 crontab 统一管理
+- 定时任务优化：启动后70分钟自动停止容器，并清理 Selenium 会话
 - 用户识别：VNC 页面通过 SE_NODE_DISPLAY_NAME 显示节点信息
 
 **部署路径：** `/mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user`
@@ -169,13 +170,16 @@ services:
 1. 创建目录结构
    ```
    rk3566-muti-user-deploy/
-   ├── docker-compose.yml      # 多用户编排
+   ├── docker-compose.yml          # 多用户编排（Selenium + 4个app服务）
    ├── scripts/
-   │   ├── ssh_scp_util.py    # 远程部署脚本
-   │   ├── setup-cron.sh      # 定时任务配置
-   │   └── check-status.py    # 状态检查
-   ├── password.xls            # SSH 密码
-   └── README.md               # 使用说明
+   │   ├── ssh_scp_util.py        # 远程部署脚本（读取password.xls，配置定时任务和开机自启）
+   │   ├── check-status.py        # 状态检查脚本（容器、定时任务、数据目录）
+   │   ├── weread-selenium.init   # 开机启动脚本模板（OpenWrt格式）
+   │   └── setup-autostart.sh     # 自启动配置辅助脚本
+   ├── password.xls                # SSH密码（本地读取，不上传）
+   ├── PLAN.md                     # 部署计划与技术文档
+   ├── 会话清理问题分析.md          # Selenium 4.x 会话清理方案
+   └── README.md                   # 使用手册
    ```
 
 2. 编写 docker-compose.yml
@@ -260,28 +264,78 @@ users:
 
 ## 定时任务配置
 
+### 持久化机制
+
+| 特性 | 说明 |
+|------|------|
+| **存储位置** | `/var/spool/cron/crontabs/root`（磁盘文件） |
+| **系统服务** | `crond` 守护进程开机自启 |
+| **重启恢复** | RK3566 重启后定时任务自动恢复 |
+| **验证命令** | `crontab -l \| grep app-1` |
+
+**重启后验证结果：**
+- app-1 (liujl4735): 4 个任务
+- app-2 (liujl3016): 4 个任务  
+- app-3 (jpx155): 4 个任务
+- app-4 (jpx181): 4 个任务
+- 包含 sleep 4200: 16 个任务（自动停止）
+- 包含 DELETE 清理: 16 个任务（会话清理）
+
+### 运行机制
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  RK3566 iStoreOS (192.168.123.51)                       │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │  crond 守护进程                                  │   │
+│  │  ┌─────────────────────────────────────────┐   │   │
+│  │  │  /var/spool/cron/crontabs/root          │   │   │
+│  │  │                                         │   │   │
+│  │  │  # weread-multi: liujl4735              │   │   │
+│  │  │  0 0 * * * cd /path && docker compose   │   │   │
+│  │  │  up app-1 -d && (sleep 4200 && stop...) │   │   │
+│  │  │                                         │   │   │
+│  │  │  # weread-multi: liujl3016              │   │   │
+│  │  │  10 1 * * * cd /path && docker compose  │   │   │
+│  │  │  up app-2 -d && (sleep 4200 && stop...) │   │   │
+│  │  │  ... (共16个任务)                        │   │   │
+│  │  └─────────────────────────────────────────┘   │   │
+│  └─────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 任务执行流程
+
+```
+定时触发 → 启动容器 → 阅读68分钟 → sleep 4200秒 → 停止容器 → 清理会话
+    │                                                    │
+    └──────────────── 后台执行 (&) ──────────────────────┘
+```
+
+### 配置详情
+
 ```bash
 # liujl4735: 00:00, 06:00, 13:00, 19:00
-0 0 * * *  cd /path && docker compose up app-1 -d
-0 6 * * *  cd /path && docker compose up app-1 -d
-0 13 * * * cd /path && docker compose up app-1 -d
-0 19 * * * cd /path && docker compose up app-1 -d
+0 0 * * *  cd /path && docker compose up app-1 -d && (sleep 4200 && docker compose stop app-1 && curl -s -X DELETE http://127.0.0.1:4444/se/grid/session 2>/dev/null || true) &
+0 6 * * *  cd /path && docker compose up app-1 -d && (sleep 4200 && docker compose stop app-1 && curl -s -X DELETE http://127.0.0.1:4444/se/grid/session 2>/dev/null || true) &
+0 13 * * * cd /path && docker compose up app-1 -d && (sleep 4200 && docker compose stop app-1 && curl -s -X DELETE http://127.0.0.1:4444/se/grid/session 2>/dev/null || true) &
+0 19 * * * cd /path && docker compose up app-1 -d && (sleep 4200 && docker compose stop app-1 && curl -s -X DELETE http://127.0.0.1:4444/se/grid/session 2>/dev/null || true) &
 
 # liujl3016: 01:10, 07:10, 14:10, 20:10
-10 1 * * *  cd /path && docker compose up app-2 -d
-10 7 * * *  cd /path && docker compose up app-2 -d
-10 14 * * * cd /path && docker compose up app-2 -d
-10 20 * * * cd /path && docker compose up app-2 -d
+10 1 * * *  cd /path && docker compose up app-2 -d && (sleep 4200 && docker compose stop app-2 && curl -s -X DELETE http://127.0.0.1:4444/se/grid/session 2>/dev/null || true) &
+10 7 * * *  cd /path && docker compose up app-2 -d && (sleep 4200 && docker compose stop app-2 && curl -s -X DELETE http://127.0.0.1:4444/se/grid/session 2>/dev/null || true) &
+10 14 * * * cd /path && docker compose up app-2 -d && (sleep 4200 && docker compose stop app-2 && curl -s -X DELETE http://127.0.0.1:4444/se/grid/session 2>/dev/null || true) &
+10 20 * * * cd /path && docker compose up app-2 -d && (sleep 4200 && docker compose stop app-2 && curl -s -X DELETE http://127.0.0.1:4444/se/grid/session 2>/dev/null || true) &
 
 # jpx155: 02:20, 08:20, 15:20, 21:20
-20 2 * * *  cd /path && docker compose up app-3 -d
-20 8 * * *  cd /path && docker compose up app-3 -d
-20 15 * * * cd /path && docker compose up app-3 -d
-20 21 * * * cd /path && docker compose up app-3 -d
+20 2 * * *  cd /path && docker compose up app-3 -d && (sleep 4200 && docker compose stop app-3 && curl -s -X DELETE http://127.0.0.1:4444/se/grid/session 2>/dev/null || true) &
+20 8 * * *  cd /path && docker compose up app-3 -d && (sleep 4200 && docker compose stop app-3 && curl -s -X DELETE http://127.0.0.1:4444/se/grid/session 2>/dev/null || true) &
+20 15 * * * cd /path && docker compose up app-3 -d && (sleep 4200 && docker compose stop app-3 && curl -s -X DELETE http://127.0.0.1:4444/se/grid/session 2>/dev/null || true) &
+20 21 * * * cd /path && docker compose up app-3 -d && (sleep 4200 && docker compose stop app-3 && curl -s -X DELETE http://127.0.0.1:4444/se/grid/session 2>/dev/null || true) &
 
 # jpx181: 03:30, 09:30, 16:30, 22:30
-30 3 * * *  cd /path && docker compose up app-4 -d
-30 9 * * *  cd /path && docker compose up app-4 -d
-30 16 * * * cd /path && docker compose up app-4 -d
-30 22 * * * cd /path && docker compose up app-4 -d
+30 3 * * *  cd /path && docker compose up app-4 -d && (sleep 4200 && docker compose stop app-4 && curl -s -X DELETE http://127.0.0.1:4444/se/grid/session 2>/dev/null || true) &
+30 9 * * *  cd /path && docker compose up app-4 -d && (sleep 4200 && docker compose stop app-4 && curl -s -X DELETE http://127.0.0.1:4444/se/grid/session 2>/dev/null || true) &
+30 16 * * * cd /path && docker compose up app-4 -d && (sleep 4200 && docker compose stop app-4 && curl -s -X DELETE http://127.0.0.1:4444/se/grid/session 2>/dev/null || true) &
+30 22 * * * cd /path && docker compose up app-4 -d && (sleep 4200 && docker compose stop app-4 && curl -s -X DELETE http://127.0.0.1:4444/se/grid/session 2>/dev/null || true) &
 ```
