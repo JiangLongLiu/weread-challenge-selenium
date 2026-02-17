@@ -12,12 +12,21 @@
 
 ```bash
 # 1. 安装 Python 依赖
-pip install pandas paramiko
+pip install pandas paramiko pyyaml
 
 # 2. 编辑 password.xls，填入 SSH 密码
 
-# 3. 执行部署（会自动删除旧容器并重新部署）
+# 3. 执行部署（会自动清理旧定时任务、上传配置并部署）
 python docs/rk3566-istoreos-deploy/account-4735/scripts/ssh_scp_util.py
+```
+
+### 定时任务
+部署时会自动配置定时任务，每 6 小时自动启动阅读。详见 [定时任务.md](./定时任务.md)
+
+### 状态检查
+```bash
+# 检查容器状态和定时任务
+python docs/rk3566-istoreos-deploy/account-4735/scripts/check-status.py
 ```
 
 ### 首次登录
@@ -29,10 +38,13 @@ python docs/rk3566-istoreos-deploy/account-4735/scripts/ssh_scp_util.py
 account-4735/
 ├── README.md                  # 本文件
 ├── 快速开始.md                # 快速开始指南
+├── 定时任务.md                # 定时任务配置说明
 ├── docker-compose.yml         # Docker 配置
 ├── password.xls               # SSH 密码文件（不提交 Git）
 └── scripts/
-    └── ssh_scp_util.py       # 主部署脚本
+    ├── ssh_scp_util.py       # 主部署脚本
+    ├── setup-cron.sh        # 定时任务配置脚本
+    └── check-status.py      # 状态检查脚本
 ```
 
 ## 配置说明
@@ -54,8 +66,11 @@ environment:
 ## 常用命令
 
 ```bash
-# 重新部署（修改配置后执行）
+# 部署（修改配置后执行）
 python docs/rk3566-istoreos-deploy/account-4735/scripts/ssh_scp_util.py
+
+# 状态检查（容器 + 定时任务）
+python docs/rk3566-istoreos-deploy/account-4735/scripts/check-status.py
 
 # SSH 手动登录
 ssh root@192.168.123.51
