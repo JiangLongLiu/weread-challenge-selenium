@@ -23,7 +23,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - SE_ENABLE_TRACING=false
-      - SE_BIND_HOST=false
+      - SE_BIND_HOST=true
       - SE_JAVA_DISABLE_HOSTNAME_VERIFICATION=false
       - SE_VNC_PASSWORD=111111
       - HTTP_PROXY=

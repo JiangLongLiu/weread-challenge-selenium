@@ -40,8 +40,10 @@ def deploy():
         os.makedirs(WORK_DATA_DIR)
         print(f"创建数据目录: {WORK_DATA_DIR}")
 
-    # 2. 复制 docker-compose.yml
-    print(f"\n[步骤 2/4] 复制 docker-compose.yml...")
+    # 2. 复制 docker-compose.yml (强制覆盖)
+    print(f"\n[步骤 2/4] 复制 docker-compose.yml (强制覆盖)...")
+    if os.path.exists(WORK_DOCKER_COMPOSE):
+        os.remove(WORK_DOCKER_COMPOSE)
     shutil.copy(DOCKER_COMPOSE_SOURCE, WORK_DOCKER_COMPOSE)
     print(f"复制: {DOCKER_COMPOSE_SOURCE} -> {WORK_DOCKER_COMPOSE}")
 
@@ -58,21 +60,8 @@ def deploy():
     except Exception as e:
         print(f"删除旧容器: {e}")
 
-    # 3.5 拉取镜像
-    print(f"\n[步骤 3.5/5] 拉取镜像...")
-    result = subprocess.run(
-        ['docker', 'compose', '-f', WORK_DOCKER_COMPOSE, 'pull'],
-        cwd=WORK_DIR,
-        capture_output=True,
-        text=True
-    )
-    if result.returncode == 0:
-        print("镜像拉取成功")
-    else:
-        print("镜像拉取失败，可能已存在")
-
-    # 4. 启动容器
-    print(f"\n[步骤 4/5] 启动容器...")
+    # 4. 启动容器并检查状态
+    print(f"\n[步骤 4/4] 启动容器并检查状态...")
     result = subprocess.run(
         ['docker', 'compose', '-f', WORK_DOCKER_COMPOSE, 'up', '-d'],
         cwd=WORK_DIR,
@@ -90,8 +79,7 @@ def deploy():
     else:
         print(f"\n容器启动失败，退出码: {result.returncode}")
 
-    # 5. 检查状态
-    print(f"\n[步骤 5/5] 检查状态...")
+    print("\n容器状态:")
     subprocess.run(['docker', 'ps', '--filter', 'name=weread-challenge-selenium-3016', '--format', 'table {{.Names}}\t{{.Status}}'])
 
     print("\n" + "=" * 50)

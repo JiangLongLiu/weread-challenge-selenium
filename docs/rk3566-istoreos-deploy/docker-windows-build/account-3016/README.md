@@ -8,7 +8,9 @@ Windows 本地 Docker 部署配置，用于微信读书自动阅读。
 account-3016/
 ├── docker-compose.yml    # Docker 容器编排配置
 ├── scripts/
-│   └── deploy.py         # 一键部署脚本
+│   ├── deploy.py         # 一键部署脚本
+│   └── setup-task.ps1    # Windows 定时任务配置脚本
+├── 定时任务.md            # 定时任务配置说明
 ├── 快速开始.md            # 快速使用指南
 └── README.md             # 本文件
 ```
@@ -20,6 +22,13 @@ account-3016/
 ```bash
 python docs/rk3566-istoreos-deploy/docker-windows-build/account-3016/scripts/deploy.py
 ```
+
+### 2. 配置定时任务（可选）
+部署后会将 docker-compose.yml 复制到工作目录。配置定时任务需要：
+1. 以管理员身份运行 PowerShell
+2. 执行：`powershell -ExecutionPolicy Bypass -File scripts/setup-task.ps1`
+
+详见 [定时任务.md](./定时任务.md)
 
 ### 2. 访问 VNC 扫码登录
 
@@ -51,10 +60,12 @@ python docs/rk3566-istoreos-deploy/docker-windows-build/account-3016/scripts/dep
 自动化部署脚本，执行以下步骤：
 
 1. 创建工作目录 `E:\dockers\weread-challenge-selenium-3016`
-2. 复制 docker-compose.yml
+2. 强制覆盖 docker-compose.yml
 3. 删除旧容器
-4. 拉取镜像
-5. 启动容器
+4. 启动容器
+
+### 定时任务
+部署后可以配置 Windows 任务计划程序，实现每 6 小时自动阅读。详见 [定时任务.md](./定时任务.md)
 
 ## 常用命令
 
