@@ -83,6 +83,8 @@ cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user && docke
 
 # liujl4735
 cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user &&  docker compose stop app-1
+# 模拟定时任务的停止流程（关键测试）
+cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose stop app-1 && docker restart weread-challenge-selenium-muti-user-selenium-1
 
 # liujl3016
 cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user &&  docker compose stop app-2
