@@ -9,7 +9,8 @@ account-3016/
 ├── docker-compose.yml    # Docker 容器编排配置
 ├── scripts/
 │   ├── deploy.py         # 一键部署脚本
-│   └── setup-task.ps1    # Windows 定时任务配置脚本
+│   ├── setup-task.ps1   # Windows 定时任务配置脚本
+│   └── remove-task.ps1  # 删除定时任务脚本
 ├── 定时任务.md            # 定时任务配置说明
 ├── 快速开始.md            # 快速使用指南
 └── README.md             # 本文件
@@ -20,7 +21,7 @@ account-3016/
 ### 1. 运行部署
 
 ```bash
-python docs/rk3566-istoreos-deploy/docker-windows-build/account-3016/scripts/deploy.py
+python docs/docker-windows-build/account-3016/scripts/deploy.py
 ```
 
 ### 2. 配置定时任务（可选）
@@ -80,7 +81,7 @@ docker logs -f weread-challenge-selenium-3016-app-1
 docker compose -f E:\dockers\weread-challenge-selenium-3016\docker-compose.yml down
 
 # 重新部署
-python docs/rk3566-istoreos-deploy/docker-windows-build/account-3016/scripts/deploy.py
+python docs/docker-windows-build/account-3016/scripts/deploy.py
 ```
 
 ## 注意事项

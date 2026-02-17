@@ -8,7 +8,7 @@
 2. 启动 Docker 容器
 
 使用：
-    python docs/rk3566-istoreos-deploy/docker-windows-build/account-3016/scripts/deploy.py
+    python docs/docker-windows-build/account-3016/scripts/deploy.py
 
 工作目录：E:\dockers\fork-workout-cool
 """
@@ -18,7 +18,7 @@ import shutil
 import subprocess
 
 # 配置路径
-SOURCE_DIR = r'E:\Qoder_workspace\weread-challenge-selenium\docs\rk3566-istoreos-deploy\docker-windows-build\account-3016'
+SOURCE_DIR = r'E:\Qoder_workspace\weread-challenge-selenium\docs\docker-windows-build\account-3016'
 WORK_DIR = r'E:\dockers\weread-challenge-selenium-3016'
 DOCKER_COMPOSE_SOURCE = os.path.join(SOURCE_DIR, 'docker-compose.yml')
 WORK_DOCKER_COMPOSE = os.path.join(WORK_DIR, 'docker-compose.yml')
