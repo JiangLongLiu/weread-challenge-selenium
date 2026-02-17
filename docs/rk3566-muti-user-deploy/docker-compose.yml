@@ -1,0 +1,75 @@
+services:
+  selenium:
+    image: selenium/standalone-chromium:144.0
+    pull_policy: never
+    shm_size: 2gb
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - SE_ENABLE_TRACING=false
+      - SE_BIND_HOST=false
+      - SE_JAVA_DISABLE_HOSTNAME_VERIFICATION=false
+      - SE_VNC_PASSWORD=111111
+      - SE_NODE_MAX_INSTANCES=10
+      - SE_NODE_MAX_SESSIONS=10
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+      - SE_NODE_DISPLAY_NAME="WeRead-MultiUser"
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
+      - http_proxy=
+      - https_proxy=
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:4444/status"]
+      interval: 5s
+      timeout: 60s
+      retries: 10
+
+  app-1:
+    image: jqknono/weread-challenge:v0.13.0
+    pull_policy: never
+    network_mode: host
+    environment:
+      - WEREAD_REMOTE_BROWSER=http://127.0.0.1:4444
+      - WEREAD_USER=liujl4735
+      - WEREAD_DURATION=68
+    volumes:
+      - ./data/liujl4735:/app/data
+    restart: unless-stopped
+
+  app-2:
+    image: jqknono/weread-challenge:v0.13.0
+    pull_policy: never
+    network_mode: host
+    environment:
+      - WEREAD_REMOTE_BROWSER=http://127.0.0.1:4444
+      - WEREAD_USER=liujl3016
+      - WEREAD_DURATION=68
+    volumes:
+      - ./data/liujl3016:/app/data
+    restart: unless-stopped
+
+  app-3:
+    image: jqknono/weread-challenge:v0.13.0
+    pull_policy: never
+    network_mode: host
+    environment:
+      - WEREAD_REMOTE_BROWSER=http://127.0.0.1:4444
+      - WEREAD_USER=jpx155
+      - WEREAD_DURATION=68
+    volumes:
+      - ./data/jpx155:/app/data
+    restart: unless-stopped
+
+  app-4:
+    image: jqknono/weread-challenge:v0.13.0
+    pull_policy: never
+    network_mode: host
+    environment:
+      - WEREAD_REMOTE_BROWSER=http://127.0.0.1:4444
+      - WEREAD_USER=jpx181
+      - WEREAD_DURATION=68
+    volumes:
+      - ./data/jpx181:/app/data
+    restart: unless-stopped

@@ -17,7 +17,7 @@
     ┌────┴────┐
     │         │
 ┌───┴───┐ ┌───┴───┐
-│user1  │ │user2  │  ← 独立容器，独立 data 目录
+│liujl4735  │ │liujl3016 │  ← 独立容器，独立 data 目录
 │docker │ │docker │
 │run    │ │run    │
 └───────┘ └───────┘
@@ -62,7 +62,7 @@
     │    │    │    │
 ┌───┴──┐┌──┴───┐┌──┴───┐┌──┴───┐
 │app-1 ││app-2 ││app-3 ││app-4 │
-│user1 ││user2 ││user3 ││user4 │
+│liujl4735 ││liujl3016 ││jpx155 ││jpx181 │
 └──────┘└──────┘└──────┘└──────┘
 ```
 
@@ -84,6 +84,7 @@ selenium:
     - SE_NODE_MAX_INSTANCES=10    # 最大实例数
     - SE_NODE_MAX_SESSIONS=10     # 最大并发会话
     - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+    - SE_NODE_DISPLAY_NAME="WeRead-MultiUser"  # VNC页面标题
 ```
 
 ### 2. 多 App 服务
@@ -95,40 +96,40 @@ services:
     network_mode: host
     environment:
       - WEREAD_REMOTE_BROWSER=http://127.0.0.1:4444
-      - WEREAD_USER=user1
+      - WEREAD_USER=liujl4735
       - WEREAD_DURATION=68
     volumes:
-      - ./data/user1:/app/data
+      - ./data/liujl4735:/app/data
 
   app-2:
     image: jqknono/weread-challenge:v0.13.0
     network_mode: host
     environment:
       - WEREAD_REMOTE_BROWSER=http://127.0.0.1:4444
-      - WEREAD_USER=user2
+      - WEREAD_USER=liujl3016
       - WEREAD_DURATION=68
     volumes:
-      - ./data/user2:/app/data
+      - ./data/liujl3016:/app/data
 
   app-3:
     image: jqknono/weread-challenge:v0.13.0
     network_mode: host
     environment:
       - WEREAD_REMOTE_BROWSER=http://127.0.0.1:4444
-      - WEREAD_USER=user3
+      - WEREAD_USER=jpx155
       - WEREAD_DURATION=68
     volumes:
-      - ./data/user3:/app/data
+      - ./data/jpx155:/app/data
 
   app-4:
     image: jqknono/weread-challenge:v0.13.0
     network_mode: host
     environment:
       - WEREAD_REMOTE_BROWSER=http://127.0.0.1:4444
-      - WEREAD_USER=user4
+      - WEREAD_USER=jpx181
       - WEREAD_DURATION=68
     volumes:
-      - ./data/user4:/app/data
+      - ./data/jpx181:/app/data
 ```
 
 ### 3. 定时任务
@@ -136,13 +137,32 @@ services:
 多用户场景下，需要为每个用户配置独立的定时任务（每日4轮）：
 
 ```bash
-# user1: 00:00, 06:00, 13:00, 19:00
-# user2: 01:10, 07:10, 14:10, 20:10
-# user3: 02:20, 08:20, 15:20, 21:20
-# user4: 03:30, 09:30, 16:30, 22:30
+# liujl4735: 00:00, 06:00, 13:00, 19:00
+# liujl3016: 01:10, 07:10, 14:10, 20:10
+# jpx155: 02:20, 08:20, 15:20, 21:20
+# jpx181: 03:30, 09:30, 16:30, 22:30
 ```
 
-## 实现计划
+## 执行记录
+
+### 2024-XX-XX 部署完成
+
+**执行步骤：**
+1. ✓ 读取 password.xls 获取 SSH 凭据（192.168.123.51:22, root）
+2. ✓ 创建 docker-compose.yml（4用户：liujl4735, liujl3016, jpx155, jpx181）
+3. ✓ 创建 ssh_scp_util.py（无人值守部署脚本）
+4. ✓ 创建 check-status.py（无人值守状态检查脚本）
+5. ✓ 执行远程部署（上传配置、创建目录、配置16个定时任务）
+6. ✓ 验证部署结果（数据目录已创建，定时任务已配置）
+
+**经验总结：**
+- 无人值守部署：通过 pandas 读取 Excel 密码，paramiko 实现 SSH 免交互
+- 定时任务管理：每个用户4个任务，共16个，通过 crontab 统一管理
+- 用户识别：VNC 页面通过 SE_NODE_DISPLAY_NAME 显示节点信息
+
+**部署路径：** `/mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user`
+
+**VNC 地址：** http://192.168.123.51:7900
 
 ### 阶段 1：基础结构搭建
 
@@ -188,16 +208,16 @@ services:
 
 ```yaml
 users:
-  - name: user1
+  - name: liujl4735
     duration: 68
     cron_times: ["0 0 * * *", "0 6 * * *", "0 13 * * *", "0 19 * * *"]
-  - name: user2
+  - name: liujl3016
     duration: 68
     cron_times: ["10 1 * * *", "10 7 * * *", "10 14 * * *", "10 20 * * *"]
-  - name: user3
+  - name: jpx155
     duration: 68
     cron_times: ["20 2 * * *", "20 8 * * *", "20 15 * * *", "20 21 * * *"]
-  - name: user4
+  - name: jpx181
     duration: 68
     cron_times: ["30 3 * * *", "30 9 * * *", "30 16 * * *", "30 22 * * *"]
 ```
@@ -209,6 +229,7 @@ users:
 3. **定时任务错开**：每个用户间隔70分钟，避免资源竞争
 4. **VNC 访问**：多用户共用一个 VNC 端口（7900），需按时间窗口登录
 5. **登录窗口**：每个用户有5分钟登录时间，需配合扫码
+6. **用户识别**：VNC 页面标题通过 `SE_NODE_DISPLAY_NAME` 显示当前会话信息，便于识别用户
 
 ## 待确认事项
 
@@ -230,8 +251,8 @@ users:
 
 ### 详细时间表
 
-| 轮次 | user1 | user2 | user3 | user4 |
-|------|-------|-------|-------|-------|
+| 轮次 | liujl4735 | liujl3016 | jpx155 | jpx181 |
+|------|------------|------------|---------|---------|
 | 第1轮 | 00:00 | 01:10 | 02:20 | 03:30 |
 | 第2轮 | 06:00 | 07:10 | 08:20 | 09:30 |
 | 第3轮 | 13:00 | 14:10 | 15:20 | 16:30 |
@@ -240,25 +261,25 @@ users:
 ## 定时任务配置
 
 ```bash
-# user1: 00:00, 06:00, 13:00, 19:00
+# liujl4735: 00:00, 06:00, 13:00, 19:00
 0 0 * * *  cd /path && docker compose up app-1 -d
 0 6 * * *  cd /path && docker compose up app-1 -d
 0 13 * * * cd /path && docker compose up app-1 -d
 0 19 * * * cd /path && docker compose up app-1 -d
 
-# user2: 01:10, 07:10, 14:10, 20:10
+# liujl3016: 01:10, 07:10, 14:10, 20:10
 10 1 * * *  cd /path && docker compose up app-2 -d
 10 7 * * *  cd /path && docker compose up app-2 -d
 10 14 * * * cd /path && docker compose up app-2 -d
 10 20 * * * cd /path && docker compose up app-2 -d
 
-# user3: 02:20, 08:20, 15:20, 21:20
+# jpx155: 02:20, 08:20, 15:20, 21:20
 20 2 * * *  cd /path && docker compose up app-3 -d
 20 8 * * *  cd /path && docker compose up app-3 -d
 20 15 * * * cd /path && docker compose up app-3 -d
 20 21 * * * cd /path && docker compose up app-3 -d
 
-# user4: 03:30, 09:30, 16:30, 22:30
+# jpx181: 03:30, 09:30, 16:30, 22:30
 30 3 * * *  cd /path && docker compose up app-4 -d
 30 9 * * *  cd /path && docker compose up app-4 -d
 30 16 * * * cd /path && docker compose up app-4 -d
