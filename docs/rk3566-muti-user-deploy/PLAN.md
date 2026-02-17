@@ -67,8 +67,10 @@
 ```
 
 **分时执行：**
-- 第一轮：00:00 - 04:40
-- 第二轮：12:00 - 16:40
+- 第1轮：00:00 - 04:40
+- 第2轮：06:00 - 10:40
+- 第3轮：13:00 - 17:40
+- 第4轮：19:00 - 23:40
 
 ## 技术要点
 
@@ -131,20 +133,13 @@ services:
 
 ### 3. 定时任务
 
-多用户场景下，需要为每个用户配置独立的定时任务（每日2轮）：
+多用户场景下，需要为每个用户配置独立的定时任务（每日4轮）：
 
 ```bash
-# 第一轮 (00:00 - 04:40)
-0 0 * * *  cd /path && docker compose up app-1 -d   # user1 @ 00:00
-10 1 * * * cd /path && docker compose up app-2 -d   # user2 @ 01:10
-20 2 * * * cd /path && docker compose up app-3 -d   # user3 @ 02:20
-30 3 * * * cd /path && docker compose up app-4 -d   # user4 @ 03:30
-
-# 第二轮 (12:00 - 16:40)
-0 12 * * *  cd /path && docker compose up app-1 -d  # user1 @ 12:00
-10 13 * * * cd /path && docker compose up app-2 -d  # user2 @ 13:10
-20 14 * * * cd /path && docker compose up app-3 -d  # user3 @ 14:20
-30 15 * * * cd /path && docker compose up app-4 -d  # user4 @ 15:30
+# user1: 00:00, 06:00, 13:00, 19:00
+# user2: 01:10, 07:10, 14:10, 20:10
+# user3: 02:20, 08:20, 15:20, 21:20
+# user4: 03:30, 09:30, 16:30, 22:30
 ```
 
 ## 实现计划
@@ -195,20 +190,16 @@ services:
 users:
   - name: user1
     duration: 68
-    cron_round1: "0 0 * * *"   # 00:00
-    cron_round2: "0 12 * * *"  # 12:00
+    cron_times: ["0 0 * * *", "0 6 * * *", "0 13 * * *", "0 19 * * *"]
   - name: user2
     duration: 68
-    cron_round1: "10 1 * * *"  # 01:10
-    cron_round2: "10 13 * * *" # 13:10
+    cron_times: ["10 1 * * *", "10 7 * * *", "10 14 * * *", "10 20 * * *"]
   - name: user3
     duration: 68
-    cron_round1: "20 2 * * *"  # 02:20
-    cron_round2: "20 14 * * *" # 14:20
+    cron_times: ["20 2 * * *", "20 8 * * *", "20 15 * * *", "20 21 * * *"]
   - name: user4
     duration: 68
-    cron_round1: "30 3 * * *"  # 03:30
-    cron_round2: "30 15 * * *" # 15:30
+    cron_times: ["30 3 * * *", "30 9 * * *", "30 16 * * *", "30 22 * * *"]
 ```
 
 ## 注意事项
@@ -225,48 +216,51 @@ users:
 - [x] 每个用户的阅读时长：**68分钟**
 - [x] 是否需要独立的 VNC 端口：**分时复用单 VNC**
 - [x] 远程主机 IP 和部署路径：**192.168.123.51** / **/mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user**
-- [x] 每日阅读次数：**2次**
+- [x] 每日阅读次数：**4次**
 
 ## 时间表设计
 
 ### 计算分析
 
 ```
-单轮时长 = 68分钟阅读 + 2分钟缓冲 = 70分钟
-4用户单轮 = 70 × 4 = 280分钟 = 4.7小时
-每日2轮 = 9.4小时（时间充裕）
+用户间隔：70分钟（68分钟阅读 + 2分钟缓冲）
+单轮时长：4用户 × 70分钟 = 280分钟 = 4小时40分钟
+每日4轮：00:00, 06:00, 13:00, 19:00 起点
 ```
 
-### 第一轮 (00:00 - 04:40)
+### 详细时间表
 
-| 用户 | 开始时间 | 结束时间 | VNC 登录窗口 |
-|------|----------|----------|--------------|
-| user1 | 00:00 | 01:08 | 00:00-00:05 |
-| user2 | 01:10 | 02:18 | 01:10-01:15 |
-| user3 | 02:20 | 03:28 | 02:20-02:25 |
-| user4 | 03:30 | 04:38 | 03:30-03:35 |
-
-### 第二轮 (12:00 - 16:40)
-
-| 用户 | 开始时间 | 结束时间 |
-|------|----------|----------|
-| user1 | 12:00 | 13:08 |
-| user2 | 13:10 | 14:18 |
-| user3 | 14:20 | 15:28 |
-| user4 | 15:30 | 16:38 |
+| 轮次 | user1 | user2 | user3 | user4 |
+|------|-------|-------|-------|-------|
+| 第1轮 | 00:00 | 01:10 | 02:20 | 03:30 |
+| 第2轮 | 06:00 | 07:10 | 08:20 | 09:30 |
+| 第3轮 | 13:00 | 14:10 | 15:20 | 16:30 |
+| 第4轮 | 19:00 | 20:10 | 21:20 | 22:30 |
 
 ## 定时任务配置
 
 ```bash
-# 第一轮
-0 0 * * *  cd /path && docker compose up app-1 -d   # user1 @ 00:00
-10 1 * * * cd /path && docker compose up app-2 -d   # user2 @ 01:10
-20 2 * * * cd /path && docker compose up app-3 -d   # user3 @ 02:20
-30 3 * * * cd /path && docker compose up app-4 -d   # user4 @ 03:30
+# user1: 00:00, 06:00, 13:00, 19:00
+0 0 * * *  cd /path && docker compose up app-1 -d
+0 6 * * *  cd /path && docker compose up app-1 -d
+0 13 * * * cd /path && docker compose up app-1 -d
+0 19 * * * cd /path && docker compose up app-1 -d
 
-# 第二轮
-0 12 * * *  cd /path && docker compose up app-1 -d  # user1 @ 12:00
-10 13 * * * cd /path && docker compose up app-2 -d  # user2 @ 13:10
-20 14 * * * cd /path && docker compose up app-3 -d  # user3 @ 14:20
-30 15 * * * cd /path && docker compose up app-4 -d  # user4 @ 15:30
+# user2: 01:10, 07:10, 14:10, 20:10
+10 1 * * *  cd /path && docker compose up app-2 -d
+10 7 * * *  cd /path && docker compose up app-2 -d
+10 14 * * * cd /path && docker compose up app-2 -d
+10 20 * * * cd /path && docker compose up app-2 -d
+
+# user3: 02:20, 08:20, 15:20, 21:20
+20 2 * * *  cd /path && docker compose up app-3 -d
+20 8 * * *  cd /path && docker compose up app-3 -d
+20 15 * * * cd /path && docker compose up app-3 -d
+20 21 * * * cd /path && docker compose up app-3 -d
+
+# user4: 03:30, 09:30, 16:30, 22:30
+30 3 * * *  cd /path && docker compose up app-4 -d
+30 9 * * *  cd /path && docker compose up app-4 -d
+30 16 * * * cd /path && docker compose up app-4 -d
+30 22 * * * cd /path && docker compose up app-4 -d
 ```
