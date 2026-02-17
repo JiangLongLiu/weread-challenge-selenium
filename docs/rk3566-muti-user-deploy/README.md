@@ -38,7 +38,7 @@ python docs/rk3566-muti-user-deploy/scripts/check-status.py
 | jpx181 | 03:30 | 09:30 | 16:30 | 22:30 |
 
 > 提示：容器在整点准时启动，浏览器和二维码约 2-3 分钟后就绪。如果错过时间窗口，可随时访问 VNC 查看状态，或手动执行 `docker compose up app-X -d` 重新启动容器。
->
+
 > **错过时间窗口的应对：**
 >
 > | 情况 | 能否登录 | 操作 |
@@ -133,6 +133,10 @@ python docs/rk3566-muti-user-deploy/scripts/ssh_scp_util.py
 3. **阅读时长**：每次阅读68分钟，每日4次
 4. **定时任务**：由 crontab 管理，可通过 `crontab -l` 查看
 5. **会话清理**：定时任务自动重启 Selenium 容器清理浏览器会话，详见[会话清理问题分析.md](会话清理问题分析.md)
+6. **数据清理**：每日 23:59 自动清理所有用户的截图（screenshot-*.png）和日志（output.log），保留 login.png
+   - 清理范围：`data/*/screenshot-*.png`、`data/*/output.log`
+   - 持久化机制：清理任务与其他定时任务一样存储在 `/var/spool/cron/crontabs/root`，RK3566 重启后依然有效
+   - 验证方法：`crontab -l | grep "daily cleanup"`
 
 ## 相关文档
 
@@ -162,6 +166,22 @@ crontab -l | grep weread-multi
 
 # 检查系统时间
 date
+```
+
+### 数据清理验证
+
+```bash
+# 查看清理任务是否存在
+crontab -l | grep "daily cleanup"
+
+# 手动执行清理命令（测试用）
+cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user
+find data -name 'screenshot-*.png' -delete
+find data -name 'output.log' -delete
+
+# 查看清理后的数据目录
+ls -la data/*/screenshot-*.png 2>/dev/null | wc -l  # 应为 0
+ls -la data/*/login.png  # 应保留
 ```
 
 ### VNC 无法访问

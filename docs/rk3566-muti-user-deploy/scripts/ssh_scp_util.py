@@ -174,9 +174,6 @@ chmod +x /etc/init.d/weread-selenium
 
 def setup_cron(ssh):
     """配置定时任务"""
-    # 先彻底清理所有包含 weread 的定时任务
-    ssh.exec_command("crontab -l 2>/dev/null | grep -v 'weread' | crontab -")
-    
     # 构建完整的 crontab 内容（启动后70分钟自动停止并清理会话）
     cron_content = """# weread-multi: liujl4735
 0 0 * * * cd {dir} && docker compose up app-1 -d && (sleep 4200 && docker compose stop app-1 && docker restart weread-challenge-selenium-muti-user-selenium-1) &
@@ -198,6 +195,8 @@ def setup_cron(ssh):
 30 9 * * * cd {dir} && docker compose up app-4 -d && (sleep 4200 && docker compose stop app-4 && docker restart weread-challenge-selenium-muti-user-selenium-1) &
 30 16 * * * cd {dir} && docker compose up app-4 -d && (sleep 4200 && docker compose stop app-4 && docker restart weread-challenge-selenium-muti-user-selenium-1) &
 30 22 * * * cd {dir} && docker compose up app-4 -d && (sleep 4200 && docker compose stop app-4 && docker restart weread-challenge-selenium-muti-user-selenium-1) &
+# weread-multi: daily cleanup (screenshots and logs)
+59 23 * * * cd {dir} && find data -name 'screenshot-*.png' -delete && find data -name 'output.log' -delete
 """.format(dir=REMOTE_DIR)
     
     # 清理旧任务并添加新任务（一次性执行）
