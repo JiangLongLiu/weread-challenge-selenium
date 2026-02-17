@@ -1,0 +1,32 @@
+services:
+  app:
+    image: jqknono/weread-challenge:v0.13.0
+    pull_policy: never
+    network_mode: host
+    environment:
+      - WEREAD_REMOTE_BROWSER=http://127.0.0.1:4444
+      - WEREAD_DURATION=68
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+  selenium:
+    image: selenium/standalone-chromium:144.0
+    pull_policy: never
+    shm_size: 2gb
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - SE_ENABLE_TRACING=false
+      - SE_BIND_HOST=false
+      - SE_JAVA_DISABLE_HOSTNAME_VERIFICATION=false
+      - SE_VNC_PASSWORD=111111
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
+      - http_proxy=
+      - https_proxy=
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:4444/status"]
+      interval: 5s
+      timeout: 60s
+      retries: 10
