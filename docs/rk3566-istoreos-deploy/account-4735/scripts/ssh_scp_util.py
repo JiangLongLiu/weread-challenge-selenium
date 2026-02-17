@@ -29,6 +29,7 @@ from paramiko import SSHClient, AutoAddPolicy
 # 配置路径 - 使用绝对路径
 PASSWORD_FILE = r'E:\Qoder_workspace\weread-challenge-selenium\docs\rk3566-istoreos-deploy\account-4735\password.xls'
 DOCKER_COMPOSE_SOURCE = r'E:\Qoder_workspace\weread-challenge-selenium\docs\rk3566-istoreos-deploy\account-4735\docker-compose.yml'
+SETUP_CRON_SCRIPT = r'E:\Qoder_workspace\weread-challenge-selenium\docs\rk3566-istoreos-deploy\account-4735\scripts\setup-cron.sh'
 REMOTE_DIR = '/mnt/sata1-1/docker/mycontainers/weread-challenge-selenium'
 
 
@@ -136,6 +137,16 @@ def create_remote_directory(ssh_client, remote_dir):
     else:
         print("data目录创建成功")
 
+    # 创建 scripts 子目录
+    scripts_dir = f'{remote_dir}/scripts'
+    print(f"创建scripts目录: {scripts_dir}")
+    cmd = f'mkdir -p {scripts_dir}'
+    stdout, stderr, code = execute_command(ssh_client, cmd)
+    if code != 0:
+        print(f"创建scripts目录失败: {stderr}")
+    else:
+        print("scripts目录创建成功")
+
 
 def upload_file(ssh_client, local_file, remote_path):
     """
@@ -178,7 +189,14 @@ def upload_docker_compose(ssh_client, local_file, remote_dir):
     try:
         sftp = ssh_client.open_sftp()
         
-        # 强制覆盖：直接 put 会覆盖已存在的文件
+        # 先删除远程文件（强制覆盖）
+        try:
+            sftp.remove(remote_path)
+            print("已删除远程旧文件")
+        except FileNotFoundError:
+            pass
+        
+        # 上传新文件
         sftp.put(local_file, remote_path)
         sftp.close()
         
@@ -189,6 +207,83 @@ def upload_docker_compose(ssh_client, local_file, remote_dir):
     except Exception as e:
         print(f"文件上传失败: {e}")
         sys.exit(1)
+
+
+def upload_setup_cron_script(ssh_client, local_script, remote_dir):
+    """
+    上传 setup-cron.sh 脚本到远程主机
+
+    Args:
+        ssh_client: SSH 客户端
+        local_script: 本地 setup-cron.sh 文件路径
+        remote_dir: 远程目录路径
+    """
+    if not os.path.exists(local_script):
+        print(f"错误: 本地文件不存在: {local_script}")
+        sys.exit(1)
+
+    remote_path = f'{remote_dir}/scripts/setup-cron.sh'
+    print(f"上传文件: {local_script} -> {remote_path}")
+
+    try:
+        sftp = ssh_client.open_sftp()
+        
+        # 先删除远程文件（强制覆盖）
+        try:
+            sftp.remove(remote_path)
+            print("已删除远程旧脚本")
+        except FileNotFoundError:
+            pass
+        
+        # 上传新文件
+        sftp.put(local_script, remote_path)
+        sftp.close()
+        
+        # 添加执行权限
+        stdin, stdout, stderr = ssh_client.exec_command(f'chmod +x {remote_path}')
+        print("脚本权限设置成功")
+        
+        print("setup-cron.sh 上传成功 (强制覆盖)!")
+    except Exception as e:
+        print(f"文件上传失败: {e}")
+        sys.exit(1)
+
+
+def cleanup_cron_tasks(ssh_client):
+    """
+    清理现有的 account-4735 定时任务
+
+    Args:
+        ssh_client: SSH 客户端
+    """
+    print("清理现有定时任务...")
+    cmd = "crontab -l 2>/dev/null | grep -v 'account-4735' | crontab -"
+    stdin, stdout, stderr = ssh_client.exec_command(cmd)
+    print("定时任务已清理")
+
+
+def execute_setup_cron(ssh_client, remote_dir):
+    """
+    在远程主机上执行 setup-cron.sh
+
+    Args:
+        ssh_client: SSH 客户端
+        remote_dir: 远程目录
+    """
+    print("执行 setup-cron.sh ...")
+    script_path = f'{remote_dir}/scripts/setup-cron.sh'
+    cmd = f'bash {script_path}'
+    stdin, stdout, stderr = ssh_client.exec_command(cmd, timeout=60)
+    
+    stdout_text = stdout.read().decode('utf-8')
+    stderr_text = stderr.read().decode('utf-8')
+    
+    if stdout_text:
+        print(stdout_text)
+    if stderr_text:
+        print("STDERR:", stderr_text)
+    
+    print("setup-cron.sh 执行完成")
 
 
 def start_containers(ssh_client, remote_dir):
@@ -268,13 +363,13 @@ def deploy():
     print("=" * 50)
 
     # 1. 读取密码
-    print("\n[步骤 1/6] 读取主机密码...")
+    print("\n[步骤 1/7] 读取主机密码...")
     host_info = read_password_from_excel(PASSWORD_FILE)
     print(f"主机: {host_info['host']} ({host_info['remark']})")
     print(f"用户: {host_info['username']}")
 
     # 2. SSH 连接
-    print("\n[步骤 2/6] 建立 SSH 连接...")
+    print("\n[步骤 2/7] 建立 SSH 连接...")
     ssh_client = connect_ssh(
         host_info['host'],
         host_info['port'],
@@ -283,22 +378,25 @@ def deploy():
     )
 
     try:
-        # 3. 创建远程目录
-        print("\n[步骤 3/6] 创建远程部署目录...")
+        # 3. 创建远程目录（包括 data 和 scripts 子目录）
+        print("\n[步骤 3/7] 创建远程部署目录...")
         create_remote_directory(ssh_client, REMOTE_DIR)
 
-        # 4. 上传 docker-compose.yml
-        print("\n[步骤 4/6] 上传 docker-compose.yml...")
+        # 4. 清理定时任务
+        print("\n[步骤 4/7] 清理现有定时任务...")
+        cleanup_cron_tasks(ssh_client)
+
+        # 5. 上传 docker-compose.yml (强制覆盖)
+        print("\n[步骤 5/7] 上传 docker-compose.yml (强制覆盖)...")
         upload_docker_compose(ssh_client, DOCKER_COMPOSE_SOURCE, REMOTE_DIR)
 
-        # 5. 启动容器
-        print("\n[步骤 5/6] 启动 Docker 容器...")
-        start_containers(ssh_client, REMOTE_DIR)
+        # 6. 上传 setup-cron.sh (强制覆盖)
+        print("\n[步骤 6/7] 上传 setup-cron.sh (强制覆盖)...")
+        upload_setup_cron_script(ssh_client, SETUP_CRON_SCRIPT, REMOTE_DIR)
 
-        # 6. 检查状态
-        print("\n[步骤 6/6] 检查容器状态...")
-        time.sleep(5)  # 等待容器启动
-        check_container_status(ssh_client)
+        # 7. 执行 setup-cron.sh
+        print("\n[步骤 7/7] 执行 setup-cron.sh ...")
+        execute_setup_cron(ssh_client, REMOTE_DIR)
 
         print("\n" + "=" * 50)
         print("部署完成!")
@@ -306,6 +404,7 @@ def deploy():
         print(f"\nVNC 界面: http://{host_info['host']}:7900")
         print("VNC 密码: secret")
         print(f"\n数据目录: {REMOTE_DIR}/data")
+        print("定时任务: 每天 00:00 自动启动阅读")
         print("请在 data/login.png 中扫描二维码登录微信读书")
 
     finally:
