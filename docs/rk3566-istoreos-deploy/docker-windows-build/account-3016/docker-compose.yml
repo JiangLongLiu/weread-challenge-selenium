@@ -1,7 +1,7 @@
 services:
   app:
-    image: jqknono/weread-challenge:latest
-    pull_policy: always
+    image: jqknono/weread-challenge:v0.13.0
+    pull_policy: never
     environment:
       - WEREAD_REMOTE_BROWSER=http://selenium:4444
       - WEREAD_DURATION=68
@@ -13,15 +13,23 @@ services:
     dns:
       - 223.5.5.5
   selenium:
-    image: selenium/standalone-chromium:latest
-    pull_policy: if_not_present
+    image: selenium/standalone-chromium:144.0
+    pull_policy: never
     shm_size: 2gb
+    ports:
+      - "4444:4444"
+      - "7900:7900"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - SE_ENABLE_TRACING=false
       - SE_BIND_HOST=false
       - SE_JAVA_DISABLE_HOSTNAME_VERIFICATION=false
+      - SE_VNC_PASSWORD=111111
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
+      - http_proxy=
+      - https_proxy=
     dns:
       - 223.5.5.5
     healthcheck:
