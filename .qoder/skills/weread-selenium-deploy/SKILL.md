@@ -80,10 +80,10 @@ environment:
 **排查命令**：
 ```bash
 # 检查 VNC 状态
-python docs/rk3566-muti-user-deploy/scripts/check_vnc.py
+python docs/rk3566-muti-user-deploy/scripts/调试/check_vnc.py
 
 # 检查开机日志
-python docs/rk3566-muti-user-deploy/scripts/check_boot_log.py
+python docs/rk3566-muti-user-deploy/scripts/工具/check_boot_log.py
 
 # 手动检查
 docker exec selenium-weread-challenge-selenium-muti-user ps aux | grep -E "xvfb|vnc"
