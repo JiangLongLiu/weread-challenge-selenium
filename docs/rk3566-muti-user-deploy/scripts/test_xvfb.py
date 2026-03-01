@@ -37,19 +37,19 @@ def main():
     
     # 检查 supervisord 配置
     print("\n【1. Supervisord Xvfb 配置】")
-    stdin, stdout, stderr = client.exec_command('docker exec weread-challenge-selenium-muti-user-selenium-1 cat /etc/supervisor/conf.d/selenium.conf 2>/dev/null | grep -A10 xvfb')
+    stdin, stdout, stderr = client.exec_command('docker exec selenium-weread-challenge-selenium-muti-user cat /etc/supervisor/conf.d/selenium.conf 2>/dev/null | grep -A10 xvfb')
     result = stdout.read().decode().strip()
     print(result if result else "配置未找到")
     
     # 检查环境变量传递
     print("\n【2. 环境变量检查】")
-    stdin, stdout, stderr = client.exec_command('docker exec weread-challenge-selenium-muti-user-selenium-1 env | grep -E "SE_SCREEN|SE_START_XVFB"')
+    stdin, stdout, stderr = client.exec_command('docker exec selenium-weread-challenge-selenium-muti-user env | grep -E "SE_SCREEN|SE_START_XVFB"')
     result = stdout.read().decode().strip()
     print(result if result else "环境变量未设置")
     
     # 检查 start-xvfb.sh 完整内容
     print("\n【3. start-xvfb.sh 完整内容】")
-    stdin, stdout, stderr = client.exec_command('docker exec weread-challenge-selenium-muti-user-selenium-1 cat /opt/bin/start-xvfb.sh')
+    stdin, stdout, stderr = client.exec_command('docker exec selenium-weread-challenge-selenium-muti-user cat /opt/bin/start-xvfb.sh')
     result = stdout.read().decode().strip()
     print(result)
     

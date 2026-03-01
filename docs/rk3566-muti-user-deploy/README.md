@@ -122,7 +122,7 @@ cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user && docke
 # liujl4735
 cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user &&  docker compose stop app-1
 # 模拟定时任务的停止流程（关键测试）
-cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose stop app-1 && docker restart weread-challenge-selenium-muti-user-selenium-1
+cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose stop app-1 && docker restart selenium-weread-challenge-selenium-muti-user
 
 # liujl3016
 cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user &&  docker compose stop app-2
@@ -305,7 +305,7 @@ sleep 4200
 docker compose stop app-X
 
 # 4. 重启 Selenium 清理会话
-docker restart weread-challenge-selenium-muti-user-selenium-1
+docker restart selenium-weread-challenge-selenium-muti-user
 ```
 
 ### 数据清理任务

@@ -86,7 +86,7 @@ python docs/rk3566-muti-user-deploy/scripts/check_vnc.py
 python docs/rk3566-muti-user-deploy/scripts/check_boot_log.py
 
 # 手动检查
-docker exec weread-challenge-selenium-muti-user-selenium-1 ps aux | grep -E "xvfb|vnc"
+docker exec selenium-weread-challenge-selenium-muti-user ps aux | grep -E "xvfb|vnc"
 ```
 
 ## 部署配置

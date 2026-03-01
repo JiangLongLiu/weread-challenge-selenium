@@ -36,37 +36,37 @@ def main():
     
     # 检查 Xvfb 的详细日志
     print("\n【1. Xvfb 退出日志】")
-    stdin, stdout, stderr = client.exec_command('docker logs weread-challenge-selenium-muti-user-selenium-1 2>&1 | grep -E "(exited: xvfb|xvfb exited)"')
+    stdin, stdout, stderr = client.exec_command('docker logs selenium-weread-challenge-selenium-muti-user 2>&1 | grep -E "(exited: xvfb|xvfb exited)"')
     result = stdout.read().decode().strip()
     print(result if result else "无退出日志")
     
     # 检查 Xvfb 启动前的日志
     print("\n【2. Xvfb 启动日志】")
-    stdin, stdout, stderr = client.exec_command('docker logs weread-challenge-selenium-muti-user-selenium-1 2>&1 | grep -E "(spawned: xvfb|success: xvfb)"')
+    stdin, stdout, stderr = client.exec_command('docker logs selenium-weread-challenge-selenium-muti-user 2>&1 | grep -E "(spawned: xvfb|success: xvfb)"')
     result = stdout.read().decode().strip()
     print(result if result else "无启动日志")
     
     # 检查是否有错误信息
     print("\n【3. Xvfb 错误信息】")
-    stdin, stdout, stderr = client.exec_command('docker logs weread-challenge-selenium-muti-user-selenium-1 2>&1 | grep -iE "(error|fail|cannot|unable)" | grep -i xvfb')
+    stdin, stdout, stderr = client.exec_command('docker logs selenium-weread-challenge-selenium-muti-user 2>&1 | grep -iE "(error|fail|cannot|unable)" | grep -i xvfb')
     result = stdout.read().decode().strip()
     print(result if result else "无错误信息")
     
     # 检查 Xvfb 是否安装
     print("\n【4. Xvfb 安装检查】")
-    stdin, stdout, stderr = client.exec_command('docker exec weread-challenge-selenium-muti-user-selenium-1 which Xvfb')
+    stdin, stdout, stderr = client.exec_command('docker exec selenium-weread-challenge-selenium-muti-user which Xvfb')
     result = stdout.read().decode().strip()
     print(result if result else "Xvfb 未找到")
     
     # 检查 xvfb-run 是否可用
     print("\n【5. xvfb-run 检查】")
-    stdin, stdout, stderr = client.exec_command('docker exec weread-challenge-selenium-muti-user-selenium-1 which xvfb-run')
+    stdin, stdout, stderr = client.exec_command('docker exec selenium-weread-challenge-selenium-muti-user which xvfb-run')
     result = stdout.read().decode().strip()
     print(result if result else "xvfb-run 未找到")
     
     # 检查 /tmp 权限
     print("\n【6. /tmp 权限检查】")
-    stdin, stdout, stderr = client.exec_command('docker exec weread-challenge-selenium-muti-user-selenium-1 ls -ld /tmp')
+    stdin, stdout, stderr = client.exec_command('docker exec selenium-weread-challenge-selenium-muti-user ls -ld /tmp')
     result = stdout.read().decode().strip()
     print(result)
     

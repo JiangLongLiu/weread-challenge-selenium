@@ -181,25 +181,25 @@ def setup_cron(ssh):
     """配置定时任务"""
     # 构建完整的 crontab 内容（启动后70分钟自动停止并清理会话）
     cron_content = """# weread-multi: liujl4735
-0 0 * * * cd {dir} && docker compose up app-1 -d && (sleep 4200 && docker compose stop app-1 && docker restart weread-challenge-selenium-muti-user-selenium-1) &
-0 6 * * * cd {dir} && docker compose up app-1 -d && (sleep 4200 && docker compose stop app-1 && docker restart weread-challenge-selenium-muti-user-selenium-1) &
-0 13 * * * cd {dir} && docker compose up app-1 -d && (sleep 4200 && docker compose stop app-1 && docker restart weread-challenge-selenium-muti-user-selenium-1) &
-0 19 * * * cd {dir} && docker compose up app-1 -d && (sleep 4200 && docker compose stop app-1 && docker restart weread-challenge-selenium-muti-user-selenium-1) &
+0 0 * * * cd {dir} && docker compose up app-1 -d && (sleep 4200 && docker compose stop app-1 && docker restart selenium-weread-challenge-selenium-muti-user) &
+0 6 * * * cd {dir} && docker compose up app-1 -d && (sleep 4200 && docker compose stop app-1 && docker restart selenium-weread-challenge-selenium-muti-user) &
+0 13 * * * cd {dir} && docker compose up app-1 -d && (sleep 4200 && docker compose stop app-1 && docker restart selenium-weread-challenge-selenium-muti-user) &
+0 19 * * * cd {dir} && docker compose up app-1 -d && (sleep 4200 && docker compose stop app-1 && docker restart selenium-weread-challenge-selenium-muti-user) &
 # weread-multi: liujl3016
-10 1 * * * cd {dir} && docker compose up app-2 -d && (sleep 4200 && docker compose stop app-2 && docker restart weread-challenge-selenium-muti-user-selenium-1) &
-10 7 * * * cd {dir} && docker compose up app-2 -d && (sleep 4200 && docker compose stop app-2 && docker restart weread-challenge-selenium-muti-user-selenium-1) &
-10 14 * * * cd {dir} && docker compose up app-2 -d && (sleep 4200 && docker compose stop app-2 && docker restart weread-challenge-selenium-muti-user-selenium-1) &
-10 20 * * * cd {dir} && docker compose up app-2 -d && (sleep 4200 && docker compose stop app-2 && docker restart weread-challenge-selenium-muti-user-selenium-1) &
+10 1 * * * cd {dir} && docker compose up app-2 -d && (sleep 4200 && docker compose stop app-2 && docker restart selenium-weread-challenge-selenium-muti-user) &
+10 7 * * * cd {dir} && docker compose up app-2 -d && (sleep 4200 && docker compose stop app-2 && docker restart selenium-weread-challenge-selenium-muti-user) &
+10 14 * * * cd {dir} && docker compose up app-2 -d && (sleep 4200 && docker compose stop app-2 && docker restart selenium-weread-challenge-selenium-muti-user) &
+10 20 * * * cd {dir} && docker compose up app-2 -d && (sleep 4200 && docker compose stop app-2 && docker restart selenium-weread-challenge-selenium-muti-user) &
 # weread-multi: jpx155
-20 2 * * * cd {dir} && docker compose up app-3 -d && (sleep 4200 && docker compose stop app-3 && docker restart weread-challenge-selenium-muti-user-selenium-1) &
-20 8 * * * cd {dir} && docker compose up app-3 -d && (sleep 4200 && docker compose stop app-3 && docker restart weread-challenge-selenium-muti-user-selenium-1) &
-20 15 * * * cd {dir} && docker compose up app-3 -d && (sleep 4200 && docker compose stop app-3 && docker restart weread-challenge-selenium-muti-user-selenium-1) &
-20 21 * * * cd {dir} && docker compose up app-3 -d && (sleep 4200 && docker compose stop app-3 && docker restart weread-challenge-selenium-muti-user-selenium-1) &
+20 2 * * * cd {dir} && docker compose up app-3 -d && (sleep 4200 && docker compose stop app-3 && docker restart selenium-weread-challenge-selenium-muti-user) &
+20 8 * * * cd {dir} && docker compose up app-3 -d && (sleep 4200 && docker compose stop app-3 && docker restart selenium-weread-challenge-selenium-muti-user) &
+20 15 * * * cd {dir} && docker compose up app-3 -d && (sleep 4200 && docker compose stop app-3 && docker restart selenium-weread-challenge-selenium-muti-user) &
+20 21 * * * cd {dir} && docker compose up app-3 -d && (sleep 4200 && docker compose stop app-3 && docker restart selenium-weread-challenge-selenium-muti-user) &
 # weread-multi: jpx181
-30 3 * * * cd {dir} && docker compose up app-4 -d && (sleep 4200 && docker compose stop app-4 && docker restart weread-challenge-selenium-muti-user-selenium-1) &
-30 9 * * * cd {dir} && docker compose up app-4 -d && (sleep 4200 && docker compose stop app-4 && docker restart weread-challenge-selenium-muti-user-selenium-1) &
-30 16 * * * cd {dir} && docker compose up app-4 -d && (sleep 4200 && docker compose stop app-4 && docker restart weread-challenge-selenium-muti-user-selenium-1) &
-30 22 * * * cd {dir} && docker compose up app-4 -d && (sleep 4200 && docker compose stop app-4 && docker restart weread-challenge-selenium-muti-user-selenium-1) &
+30 3 * * * cd {dir} && docker compose up app-4 -d && (sleep 4200 && docker compose stop app-4 && docker restart selenium-weread-challenge-selenium-muti-user) &
+30 9 * * * cd {dir} && docker compose up app-4 -d && (sleep 4200 && docker compose stop app-4 && docker restart selenium-weread-challenge-selenium-muti-user) &
+30 16 * * * cd {dir} && docker compose up app-4 -d && (sleep 4200 && docker compose stop app-4 && docker restart selenium-weread-challenge-selenium-muti-user) &
+30 22 * * * cd {dir} && docker compose up app-4 -d && (sleep 4200 && docker compose stop app-4 && docker restart selenium-weread-challenge-selenium-muti-user) &
 # weread-multi: daily cleanup (screenshots and logs)
 59 23 * * * cd {dir} && find data -name 'screenshot-*.png' -delete && find data -name 'output.log' -delete
 """.format(dir=REMOTE_DIR)
