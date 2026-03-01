@@ -7,7 +7,7 @@ import pandas as pd
 import paramiko
 
 PASSWORD_FILE = r'E:\Qoder_workspace\weread-challenge-selenium\docs\rk3566-oect1-2-fnOS-deploy\password.csv'
-REMOTE_DIR = "/mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-oect1"
+REMOTE_DIR = "/vol1/docker/mycontainers/weread-challenge-selenium-muti-user"
 
 
 def get_credentials():

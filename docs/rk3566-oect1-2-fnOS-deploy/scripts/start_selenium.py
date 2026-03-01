@@ -30,7 +30,7 @@ def main():
     )
 
     print("=== 启动 selenium ===")
-    cmd = 'cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-oect1 && docker compose up -d selenium'
+    cmd = 'cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up -d selenium'
     stdin, stdout, stderr = client.exec_command(cmd)
     result = stdout.read().decode().strip()
     err = stderr.read().decode().strip()

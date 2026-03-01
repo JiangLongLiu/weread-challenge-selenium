@@ -5,7 +5,7 @@
 START=99
 STOP=10
 
-WORK_DIR="/mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-oect1"
+WORK_DIR="/vol1/docker/mycontainers/weread-challenge-selenium-muti-user"
 
 check_docker() {
     while ! docker ps >/dev/null 2>&1; do

@@ -36,7 +36,7 @@ def main():
     
     # 步骤1: 手动启动 app-1
     print("\n【步骤1】手动启动 app-1")
-    cmd = 'cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-oect1 && docker compose up app-1 -d'
+    cmd = 'cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up app-1 -d'
     stdin, stdout, stderr = client.exec_command(cmd)
     exit_code = stdout.channel.recv_exit_status()
     stdout_data = stdout.read().decode()
@@ -69,7 +69,7 @@ def main():
     
     # 步骤4: 检查数据目录
     print("\n【步骤4】检查 liujl4735 数据目录")
-    stdin, stdout, stderr = client.exec_command('ls -la /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-oect1/data/liujl4735/')
+    stdin, stdout, stderr = client.exec_command('ls -la /vol1/docker/mycontainers/weread-challenge-selenium-muti-user/data/liujl4735/')
     result = stdout.read().decode().strip()
     print(result if result else "目录不存在")
     
