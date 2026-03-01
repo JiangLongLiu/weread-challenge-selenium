@@ -1,6 +1,6 @@
 ---
 name: weread-selenium-deploy
-description: RK3566 iStoreOS / RK3566-OECT-2-fnOS 微信读书多用户部署全流程。包含部署脚本、开机启动、定时任务、VNC/Xvfb 故障排查。使用于 RK3566、iStoreOS、fnOS、Docker 部署、微信读书自动化、多用户隔离、Selenium Grid 等场景。
+description: RK3566 iStoreOS / RK3566-OECT-2-fnOS 微信读书多用户部署全流程。包含部署脚本、开机启动、定时任务、VNC/Xvfb 故障排查。适用于 RK3566、iStoreOS、fnOS、Docker 部署、微信读书自动化、多用户隔离、Selenium Grid 等场景。
 ---
 
 # WeRead Selenium 部署
@@ -9,32 +9,20 @@ description: RK3566 iStoreOS / RK3566-OECT-2-fnOS 微信读书多用户部署全
 
 根据目标主机选择对应的部署方案：
 
-| 主机 | IP | 工作目录 | 部署目录 |
-|------|-----|----------|----------|
-| **RK3566 iStoreOS** | 192.168.123.51 | /mnt/sata1-1/docker/mycontainers/... | rk3566-muti-user-deploy |
-| **RK3566-OECT-2-fnOS** | 192.168.123.52 | /vol1/docker/mycontainers/... | rk3566-oect-2-fnOS-deploy |
+| 主机 | IP | 工作目录 | 部署目录 | 开机启动方式 |
+|------|-----|----------|----------|-------------|
+| **RK3566-OECT-2-fnOS** | 192.168.123.52 | /vol1/docker/mycontainers/... | rk3566-oect-2-fnOS-deploy | systemd |
+| RK3566 iStoreOS | 192.168.123.51 | /mnt/sata1-1/docker/mycontainers/... | rk3566-muti-user-deploy | init.d |
 
 ## 快速开始
+
+### RK3566-OECT-2-fnOS (192.168.123.52) - 推荐
+
+```bash
+python docs/rk3566-oect-2-fnOS-deploy/scripts/ssh_scp_util.py
+```
 
 ### RK3566 iStoreOS (192.168.123.51)
-
-`ash
-python docs/rk3566-muti-user-deploy/scripts/ssh_scp_util.py
-`
-
-### RK3566-OECT-2-fnOS (192.168.123.52)
-
-`ash
-python docs/rk3566-oect-2-fnOS-deploy/scripts/ssh_scp_util.py
-`
-
-
-
-# WeRead Selenium 部署
-
-## 快速开始
-
-### 1. 部署
 
 ```bash
 python docs/rk3566-muti-user-deploy/scripts/ssh_scp_util.py
@@ -57,15 +45,28 @@ python docs/rk3566-muti-user-deploy/scripts/check-status.py
 
 ## 开机启动
 
-### 脚本位置
-- 脚本：`/etc/init.d/weread-selenium`
-- 链接：`/etc/rc.d/S99weread-selenium`
+### 差异对比
 
-### 启动流程
-1. 等待 180 秒（避免 RK3566 CPU 卡死）
-2. 等待 Docker 就绪
-3. **清理 X11 资源**：`rm -f /tmp/.X*-lock /tmp/.X11-unix/X*`
-4. 启动 Selenium 容器
+| 项目 | RK3566-OECT-2-fnOS | RK3566 iStoreOS |
+|------|---------------------|-----------------|
+| 启动方式 | systemd | init.d |
+| 服务文件 | /etc/systemd/system/weread-selenium.service | /etc/init.d/weread-selenium |
+| 链接位置 | 自动创建 | /etc/rc.d/S99weread-selenium |
+| 等待时间 | sleep 180 | sleep 180 |
+
+### RK3566-OECT-2-fnOS 启动流程（systemd）
+1. systemd 启动 weread-selenium.service
+2. 等待 180 秒（避免 CPU 卡死）
+3. 等待 Docker 就绪
+4. **清理 X11 资源**：`rm -f /tmp/.X*-lock /tmp/.X11-unix/X*`
+5. 启动 Selenium 容器
+
+### RK3566 iStoreOS 启动流程（init.d）
+1. OpenWrt 启动 /etc/rc.d/S99weread-selenium
+2. 等待 180 秒
+3. 等待 Docker 就绪
+4. **清理 X11 资源**
+5. 启动 Selenium 容器
 
 ### 关键配置（docker-compose.yml）
 ```yaml
@@ -107,10 +108,10 @@ environment:
 **排查命令**：
 ```bash
 # 检查 VNC 状态
-python docs/rk3566-muti-user-deploy/scripts/调试/check_vnc.py
+python docs/rk3566-oect-2-fnOS-deploy/scripts/调试/check_vnc.py
 
 # 检查开机日志
-python docs/rk3566-muti-user-deploy/scripts/工具/check_boot_log.py
+python docs/rk3566-oect-2-fnOS-deploy/scripts/工具/check_boot_log.py
 
 # 手动检查
 docker exec weread-challenge-selenium-muti-user ps aux | grep -E "xvfb|vnc"
@@ -133,6 +134,17 @@ docker exec weread-challenge-selenium-muti-user ps aux | grep -E "xvfb|vnc"
 
 ## 常用命令
 
+### RK3566-OECT-2-fnOS（推荐）
+```bash
+# 手动启动 selenium
+cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user
+docker compose up -d selenium
+
+# 手动启动用户容器
+docker compose up app-1 -d
+```
+
+### RK3566 iStoreOS
 ```bash
 # 手动启动 selenium
 cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user
@@ -140,7 +152,9 @@ docker compose up -d selenium
 
 # 手动启动用户容器
 docker compose up app-1 -d
+```
 
+```bash
 # 查看日志
 docker compose logs -f app-1
 
@@ -150,5 +164,5 @@ docker compose stop app-1
 
 ## 参考文档
 
-- [README.md](docs/rk3566-muti-user-deploy/README.md) - 完整部署文档
-- [docker-compose.yml](docs/rk3566-muti-user-deploy/docker-compose.yml) - 容器配置
+- [README.md - fnOS](docs/rk3566-oect-2-fnOS-deploy/README.md) - 完整部署文档
+- [docker-compose.yml - fnOS](docs/rk3566-oect-2-fnOS-deploy/docker-compose.yml) - 容器配置
