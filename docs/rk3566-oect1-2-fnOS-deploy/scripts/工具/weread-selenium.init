@@ -9,10 +9,10 @@ start() {
     while ! docker ps >/dev/null 2>&1; do
         sleep 2
     done
-    cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up -d selenium
+    cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up -d selenium
 }
 
 stop() {
     echo "Stopping WeRead Selenium..."
-    cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose down
+    cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose down
 }
