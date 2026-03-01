@@ -1,0 +1,17 @@
+[Unit]
+Description=WeRead Selenium Container
+After=network-online.target docker.service
+Requires=docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=/bin/sleep 180
+ExecStartPre=/bin/bash -c "while ! docker ps >/dev/null 2>&1; do sleep 2; done"
+ExecStartPre=/bin/rm -f /tmp/.X1-lock /tmp/.X11-unix/X99
+ExecStart=/usr/bin/docker compose -f /vol1/docker/mycontainers/weread-challenge-selenium-muti-user/docker-compose.yml up -d selenium
+ExecStop=/usr/bin/docker compose -f /vol1/docker/mycontainers/weread-challenge-selenium-muti-user/docker-compose.yml down
+
+[Install]
+WantedBy=multi-user.target
