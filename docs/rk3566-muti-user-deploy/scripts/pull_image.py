@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 """
-拉取 v0.15.0 镜像
+拉取 weread-challenge 镜像
+自动从 docker-compose.yml 读取镜像版本
 """
 
+import os
 import pandas as pd
 import paramiko
+import yaml
 
 PASSWORD_FILE = r'E:\Qoder_workspace\weread-challenge-selenium\docs\rk3566-muti-user-deploy\password.xls'
+COMPOSE_FILE = r'E:\Qoder_workspace\weread-challenge-selenium\docs\rk3566-muti-user-deploy\docker-compose.yml'
 
 def get_credentials():
     df = pd.read_excel(PASSWORD_FILE)
@@ -18,9 +22,21 @@ def get_credentials():
         'password': str(row['密码']).strip()
     }
 
+def get_image_version():
+    """从 docker-compose.yml 读取镜像版本"""
+    with open(COMPOSE_FILE, 'r', encoding='utf-8') as f:
+        compose = yaml.safe_load(f)
+
+    # 读取 app-1 的镜像
+    image = compose['services']['app-1']['image']
+    # 提取版本号（格式：jqknono/weread-challenge:v0.15.0）
+    version = image.split(':')[-1]
+    return image, version
+
 def main():
     cred = get_credentials()
-    
+    image, version = get_image_version()
+
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.connect(
@@ -29,12 +45,12 @@ def main():
         username=cred['username'],
         password=cred['password']
     )
-    
+
     print("=" * 60)
-    print("拉取 v0.15.0 镜像")
+    print(f"拉取 {image} 镜像")
     print("=" * 60)
-    
-    cmd = 'docker pull jqknono/weread-challenge:v0.15.0'
+
+    cmd = f'docker pull {image}'
     print(f"执行: {cmd}")
     print("这可能需要几分钟...\n")
     
