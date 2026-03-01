@@ -1,0 +1,93 @@
+services:
+  app-1:
+    container_name: app-1-1-weread-challenge-selenium-oect1
+    environment:
+    - WEREAD_REMOTE_BROWSER=http://127.0.0.1:4444
+    - WEREAD_USER=liujl4735
+    - WEREAD_DURATION=68
+    image: jqknono/weread-challenge:v0.15.0
+    network_mode: host
+    pull_policy: never
+    restart: unless-stopped
+    volumes:
+    - ./data/liujl4735:/app/data
+  app-2:
+    container_name: app-2-1-weread-challenge-selenium-oect1
+    environment:
+    - WEREAD_REMOTE_BROWSER=http://127.0.0.1:4444
+    - WEREAD_USER=liujl3016
+    - WEREAD_DURATION=68
+    image: jqknono/weread-challenge:v0.15.0
+    network_mode: host
+    pull_policy: never
+    restart: unless-stopped
+    volumes:
+    - ./data/liujl3016:/app/data
+  app-3:
+    container_name: app-3-1-weread-challenge-selenium-oect1
+    environment:
+    - WEREAD_REMOTE_BROWSER=http://127.0.0.1:4444
+    - WEREAD_USER=jpx155
+    - WEREAD_DURATION=68
+    image: jqknono/weread-challenge:v0.15.0
+    network_mode: host
+    pull_policy: never
+    restart: unless-stopped
+    volumes:
+    - ./data/jpx155:/app/data
+  app-4:
+    container_name: app-4-1-weread-challenge-selenium-oect1
+    environment:
+    - WEREAD_REMOTE_BROWSER=http://127.0.0.1:4444
+    - WEREAD_USER=jpx181
+    - WEREAD_DURATION=68
+    image: jqknono/weread-challenge:v0.15.0
+    network_mode: host
+    pull_policy: never
+    restart: unless-stopped
+    volumes:
+    - ./data/jpx181:/app/data
+  selenium:
+    container_name: selenium-weread-challenge-selenium-oect1
+    environment:
+    - SE_ENABLE_TRACING=false
+    - SE_BIND_HOST=false
+    - SE_JAVA_DISABLE_HOSTNAME_VERIFICATION=false
+    - SE_VNC_PASSWORD=111111
+    - SE_NODE_MAX_INSTANCES=10
+    - SE_NODE_MAX_SESSIONS=10
+    - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+    - SE_NODE_DISPLAY_NAME="WeRead-MultiUser"
+    - SE_SCREEN_WIDTH=1920
+    - SE_SCREEN_HEIGHT=1080
+    - SE_SCREEN_DEPTH=24
+    - SE_SCREEN_DPI=96
+    - DISPLAY_NUM=98
+    - DISPLAY=:98.0
+    - SE_START_XVFB=true
+    - SE_START_VNC=true
+    - SE_START_NO_VNC=true
+    - HTTP_PROXY=
+    - HTTPS_PROXY=
+    - http_proxy=
+    - https_proxy=
+    extra_hosts:
+    - iStoreOS:127.0.0.1
+    - selenium:127.0.0.1
+    healthcheck:
+      interval: 5s
+      retries: 10
+      test:
+      - CMD
+      - curl
+      - -f
+      - http://127.0.0.1:4444/status
+      timeout: 60s
+    hostname: selenium
+    image: selenium/standalone-chromium:144.0
+    network_mode: host
+    pull_policy: never
+    restart: unless-stopped
+    shm_size: 2gb
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock

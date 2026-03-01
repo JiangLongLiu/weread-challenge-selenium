@@ -1,7 +1,34 @@
 ---
 name: weread-selenium-deploy
-description: RK3566 iStoreOS 微信读书多用户部署全流程。包含部署脚本、开机启动、定时任务、VNC/Xvfb 故障排查。使用于 RK3566、iStoreOS、Docker 部署、微信读书自动化、多用户隔离、Selenium Grid 等场景。
+description: RK3566 iStoreOS / RK3566-OECT1-2-fnOS 微信读书多用户部署全流程。包含部署脚本、开机启动、定时任务、VNC/Xvfb 故障排查。使用于 RK3566、iStoreOS、fnOS、Docker 部署、微信读书自动化、多用户隔离、Selenium Grid 等场景。
 ---
+
+# WeRead Selenium 部署
+
+## 主机选择
+
+根据目标主机选择对应的部署方案：
+
+| 主机 | IP | 工作目录 | 部署目录 |
+|------|-----|----------|----------|
+| **RK3566 iStoreOS** | 192.168.123.51 | /mnt/sata1-1/docker/mycontainers/... | rk3566-muti-user-deploy |
+| **RK3566-OECT1-2-fnOS** | 192.168.123.52 | /vol1/docker/mycontainers/... | rk3566-oect1-2-fnOS-deploy |
+
+## 快速开始
+
+### RK3566 iStoreOS (192.168.123.51)
+
+`ash
+python docs/rk3566-muti-user-deploy/scripts/ssh_scp_util.py
+`
+
+### RK3566-OECT1-2-fnOS (192.168.123.52)
+
+`ash
+python docs/rk3566-oect1-2-fnOS-deploy/scripts/ssh_scp_util.py
+`
+
+
 
 # WeRead Selenium 部署
 
