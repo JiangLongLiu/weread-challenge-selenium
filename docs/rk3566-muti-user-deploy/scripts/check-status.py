@@ -6,12 +6,12 @@
 import pandas as pd
 import paramiko
 
-PASSWORD_FILE = r'E:\Qoder_workspace\weread-challenge-selenium\docs\rk3566-muti-user-deploy\password.xls'
+PASSWORD_FILE = r'E:\Qoder_workspace\weread-challenge-selenium\docs\rk3566-muti-user-deploy\password.csv'
 REMOTE_DIR = "/mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user"
 
 
 def get_credentials():
-    df = pd.read_excel(PASSWORD_FILE)
+    df = pd.read_csv(PASSWORD_FILE)
     row = df.iloc[0]
     return {
         'host': str(row['IP地址']).strip(),

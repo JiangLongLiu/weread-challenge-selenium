@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 4用户远程部署脚本 - 无人值守版本
-自动从 password.xls 读取 SSH 凭据
+自动从 password.csv 读取 SSH 凭据
 """
 
 import pandas as pd
@@ -10,14 +10,14 @@ from scp import SCPClient
 import os
 
 # 配置
-PASSWORD_FILE = r'E:\Qoder_workspace\weread-challenge-selenium\docs\rk3566-muti-user-deploy\password.xls'
+PASSWORD_FILE = r'E:\Qoder_workspace\weread-challenge-selenium\docs\rk3566-muti-user-deploy\password.csv'
 LOCAL_DIR = r'E:\Qoder_workspace\weread-challenge-selenium\docs\rk3566-muti-user-deploy'
 REMOTE_DIR = "/mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user"
 
 
 def get_credentials():
-    """从 Excel 读取 SSH 凭据"""
-    df = pd.read_excel(PASSWORD_FILE)
+    """从 CSV 读取 SSH 凭据"""
+    df = pd.read_csv(PASSWORD_FILE)
     row = df.iloc[0]
     return {
         'host': str(row['IP地址']).strip(),

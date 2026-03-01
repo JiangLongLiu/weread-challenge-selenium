@@ -14,7 +14,7 @@
 # 1. 安装 Python 依赖
 pip install pandas paramiko pyyaml
 
-# 2. 编辑 password.xls，填入 SSH 密码
+# 2. 编辑 password.csv，填入 SSH 密码
 
 # 3. 执行部署（会自动清理旧定时任务、上传配置并部署）
 python docs/rk3566-istoreos-deploy/account-4735/scripts/ssh_scp_util.py
@@ -40,7 +40,7 @@ account-4735/
 ├── 快速开始.md                # 快速开始指南
 ├── 定时任务.md                # 定时任务配置说明
 ├── docker-compose.yml         # Docker 配置
-├── password.xls               # SSH 密码文件（不提交 Git）
+├── password.csv               # SSH 密码文件（不提交 Git）
 └── scripts/
     ├── ssh_scp_util.py       # 主部署脚本
     ├── setup-cron.sh        # 定时任务配置脚本

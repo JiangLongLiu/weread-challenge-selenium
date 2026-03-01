@@ -14,7 +14,7 @@ pip install pandas paramiko
 ## 脚本功能
 
 ### 1. 密码读取
-从 Excel 文件 `password.xls` 读取主机凭证：
+从 Excel 文件 `password.csv` 读取主机凭证：
 - IP 地址
 - 用户名
 - 密码
@@ -49,7 +49,7 @@ python docs/rk3566-istoreos-deploy/scripts/ssh_scp_util.py
 ```
 
 ### 脚本会自动执行以下操作：
-1. 读取 password.xls 获取主机凭证
+1. 读取 password.csv 获取主机凭证
 2. 建立 SSH 连接
 3. 创建远程部署目录
 4. **上传本地 docker-compose.yml** 到远程主机
@@ -79,7 +79,7 @@ def deploy():
 ## 自定义配置
 
 ### 修改目标主机
-编辑 `docs/rk3566-istoreos-deploy/password.xls` 文件
+编辑 `docs/rk3566-istoreos-deploy/password.csv` 文件
 
 ### 修改部署目录
 在脚本中修改 `REMOTE_DIR` 变量：

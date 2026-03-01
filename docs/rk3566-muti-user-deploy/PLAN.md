@@ -148,7 +148,7 @@ services:
 ### 2024-XX-XX 部署完成
 
 **执行步骤：**
-1. ✓ 读取 password.xls 获取 SSH 凭据（192.168.123.51:22, root）
+1. ✓ 读取 password.csv 获取 SSH 凭据（192.168.123.51:22, root）
 2. ✓ 创建 docker-compose.yml（4用户：liujl4735, liujl3016, jpx155, jpx181）
 3. ✓ 创建 ssh_scp_util.py（无人值守部署脚本）
 4. ✓ 创建 check-status.py（无人值守状态检查脚本）
@@ -172,11 +172,11 @@ services:
    rk3566-muti-user-deploy/
    ├── docker-compose.yml          # 多用户编排（Selenium + 4个app服务）
    ├── scripts/
-   │   ├── ssh_scp_util.py        # 远程部署脚本（读取password.xls，配置定时任务和开机自启）
+   │   ├── ssh_scp_util.py        # 远程部署脚本（读取password.csv，配置定时任务和开机自启）
    │   ├── check-status.py        # 状态检查脚本（容器、定时任务、数据目录）
    │   ├── weread-selenium.init   # 开机启动脚本模板（OpenWrt格式）
    │   └── setup-autostart.sh     # 自启动配置辅助脚本
-   ├── password.xls                # SSH密码（本地读取，不上传）
+   ├── password.csv                # SSH密码（本地读取，不上传）
    ├── PLAN.md                     # 部署计划与技术文档
    ├── 会话清理问题分析.md          # Selenium 4.x 会话清理方案
    └── README.md                   # 使用手册

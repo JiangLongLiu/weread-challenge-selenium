@@ -14,7 +14,7 @@
 # 1. 安装 Python 依赖
 pip install pandas paramiko
 
-# 2. 编辑 password.xls，填入 SSH 密码
+# 2. 编辑 password.csv，填入 SSH 密码
 
 # 3. 执行部署（会自动删除旧容器并重新部署）
 python docs/rk3566-istoreos-deploy/scripts/ssh_scp_util.py
@@ -30,7 +30,7 @@ rk3566-istoreos-deploy/
 ├── README.md                  # 本文件
 ├── 快速开始.md                # 快速开始指南
 ├── docker-compose.yml         # Docker 配置
-├── password.xls               # SSH 密码文件（不提交 Git）
+├── password.csv               # SSH 密码文件（不提交 Git）
 └── scripts/
     └── ssh_scp_util.py       # 主部署脚本
 ```

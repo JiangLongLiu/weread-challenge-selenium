@@ -11,7 +11,7 @@ python docs/rk3566-muti-user-deploy/scripts/ssh_scp_util.py
 ```
 
 自动完成：
-- 读取 password.xls 中的 SSH 凭据
+- 读取 password.csv 中的 SSH 凭据
 - 上传 docker-compose.yml 到远程主机
 - 创建4个用户的数据目录
 - 配置16个定时任务（每用户4个）
@@ -54,7 +54,7 @@ python docs/rk3566-muti-user-deploy/scripts/check-status.py
 ```
 rk3566-muti-user-deploy/
 ├── docker-compose.yml          # 容器编排配置
-├── password.xls                # SSH 凭据（不提交Git）
+├── password.csv                # SSH 凭据（不提交Git）
 ├── PLAN.md                     # 部署计划与执行记录
 ├── README.md                   # 本文件
 ├── 会话清理问题分析.md          # Selenium 会话清理方案
