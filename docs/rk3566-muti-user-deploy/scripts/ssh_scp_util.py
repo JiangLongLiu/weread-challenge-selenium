@@ -138,6 +138,8 @@ def setup_autostart(ssh):
         '',
         'start() {',
         '    echo "Starting WeRead Selenium..."',
+        '    # 启动 cron 服务',
+        '    /etc/init.d/cron start',
         '    echo "Waiting 180 seconds for system to stabilize..."',
         '    sleep 180',
         '    while ! docker ps >/dev/null 2>&1; do',
