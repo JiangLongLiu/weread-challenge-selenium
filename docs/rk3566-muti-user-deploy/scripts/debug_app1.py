@@ -60,7 +60,7 @@ def main():
     
     # 步骤3: 查看容器日志
     print("\n【步骤3】查看容器日志")
-    stdin, stdout, stderr = client.exec_command('docker logs weread-challenge-selenium-muti-user-app-1-1 2>&1 | tail -30')
+    stdin, stdout, stderr = client.exec_command('docker logs app-1-1-weread-challenge-selenium-muti-user 2>&1 | tail -30')
     logs = stdout.read().decode().strip()
     if logs:
         print(logs)
