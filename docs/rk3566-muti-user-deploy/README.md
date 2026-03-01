@@ -61,7 +61,10 @@ rk3566-muti-user-deploy/
 └── scripts/
     ├── ssh_scp_util.py        # 部署脚本（含开机启动配置）
     ├── check-status.py        # 状态检查脚本
-    └── weread-selenium.init   # 开机启动脚本模板
+    ├── weread-selenium.init   # 开机启动脚本模板
+    ├── check_time_and_tasks.py  # 检查时间和定时任务
+    ├── debug_app1.py          # 调试 app-1 启动
+    └── pull_image.py          # 拉取 Docker 镜像
 ```
 
 ### 远程主机（RK3566）文件
@@ -195,6 +198,9 @@ ls -la /etc/rc.d/S99weread-selenium
 - [scripts/ssh_scp_util.py](scripts/ssh_scp_util.py) - 自动化部署脚本
 - [scripts/check-status.py](scripts/check-status.py) - 状态检查脚本
 - [scripts/weread-selenium.init](scripts/weread-selenium.init) - 开机启动脚本模板
+- [scripts/check_time_and_tasks.py](scripts/check_time_and_tasks.py) - 检查时间和定时任务
+- [scripts/debug_app1.py](scripts/debug_app1.py) - 调试 app-1 启动
+- [scripts/pull_image.py](scripts/pull_image.py) - 拉取 Docker 镜像
 
 ## 开机启动流程
 
