@@ -36,26 +36,26 @@ def main():
     
     # 检查环境变量
     print("\n【1. 检查 DISPLAY 环境变量】")
-    stdin, stdout, stderr = client.exec_command('docker exec selenium-weread-challenge-selenium-muti-user env | grep DISPLAY')
+    stdin, stdout, stderr = client.exec_command('docker exec weread-challenge-selenium-muti-user env | grep DISPLAY')
     result = stdout.read().decode().strip()
     print(result)
     
     # 手动运行 xvfb-run 查看详细错误
     print("\n【2. 手动运行 xvfb-run】")
-    cmd = 'docker exec selenium-weread-challenge-selenium-muti-user xvfb-run --server-num=99 --listen-tcp --server-args="-screen 0 1920x1080x24" echo test 2>&1'
+    cmd = 'docker exec weread-challenge-selenium-muti-user xvfb-run --server-num=99 --listen-tcp --server-args="-screen 0 1920x1080x24" echo test 2>&1'
     stdin, stdout, stderr = client.exec_command(cmd)
     result = stdout.read().decode().strip()
     print(result)
     
     # 检查 Xvfb 是否可用
     print("\n【3. 检查 Xvfb 版本】")
-    stdin, stdout, stderr = client.exec_command('docker exec selenium-weread-challenge-selenium-muti-user Xvfb -version 2>&1 | head -2')
+    stdin, stdout, stderr = client.exec_command('docker exec weread-challenge-selenium-muti-user Xvfb -version 2>&1 | head -2')
     result = stdout.read().decode().strip()
     print(result)
     
     # 检查 /var/tmp 是否存在
     print("\n【4. 检查 /var/tmp】")
-    stdin, stdout, stderr = client.exec_command('docker exec selenium-weread-challenge-selenium-muti-user ls -ld /var/tmp')
+    stdin, stdout, stderr = client.exec_command('docker exec weread-challenge-selenium-muti-user ls -ld /var/tmp')
     result = stdout.read().decode().strip()
     print(result)
     

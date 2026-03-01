@@ -36,19 +36,19 @@ def main():
     
     # 检查 xvfb stderr 日志
     print("\n【1. Xvfb stderr 日志】")
-    stdin, stdout, stderr = client.exec_command('docker exec selenium-weread-challenge-selenium-muti-user cat /var/log/supervisor/xvfb-stderr.log 2>/dev/null || echo "日志文件不存在"')
+    stdin, stdout, stderr = client.exec_command('docker exec weread-challenge-selenium-muti-user cat /var/log/supervisor/xvfb-stderr.log 2>/dev/null || echo "日志文件不存在"')
     result = stdout.read().decode().strip()
     print(result if result else "空日志")
     
     # 检查 xvfb stdout 日志
     print("\n【2. Xvfb stdout 日志】")
-    stdin, stdout, stderr = client.exec_command('docker exec selenium-weread-challenge-selenium-muti-user cat /var/log/supervisor/xvfb-stdout.log 2>/dev/null || echo "日志文件不存在"')
+    stdin, stdout, stderr = client.exec_command('docker exec weread-challenge-selenium-muti-user cat /var/log/supervisor/xvfb-stdout.log 2>/dev/null || echo "日志文件不存在"')
     result = stdout.read().decode().strip()
     print(result if result else "空日志")
     
     # 检查 vnc 日志
     print("\n【3. VNC stderr 日志】")
-    stdin, stdout, stderr = client.exec_command('docker exec selenium-weread-challenge-selenium-muti-user cat /var/log/supervisor/vnc-stderr.log 2>/dev/null || echo "日志文件不存在"')
+    stdin, stdout, stderr = client.exec_command('docker exec weread-challenge-selenium-muti-user cat /var/log/supervisor/vnc-stderr.log 2>/dev/null || echo "日志文件不存在"')
     result = stdout.read().decode().strip()
     print(result if result else "空日志")
     

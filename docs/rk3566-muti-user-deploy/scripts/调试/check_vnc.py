@@ -45,7 +45,7 @@ def main():
     
     # 检查 Selenium 容器内的 VNC 进程
     print("\n【Selenium 容器内 VNC 进程】")
-    stdin, stdout, stderr = client.exec_command('docker exec selenium-weread-challenge-selenium-muti-user ps aux | grep -i vnc')
+    stdin, stdout, stderr = client.exec_command('docker exec weread-challenge-selenium-muti-user ps aux | grep -i vnc')
     result = stdout.read().decode().strip()
     if result:
         print(result)
@@ -54,13 +54,13 @@ def main():
     
     # 检查 Selenium 容器日志
     print("\n【Selenium 容器日志（最近20行）】")
-    stdin, stdout, stderr = client.exec_command('docker logs selenium-weread-challenge-selenium-muti-user 2>&1 | tail -20')
+    stdin, stdout, stderr = client.exec_command('docker logs weread-challenge-selenium-muti-user 2>&1 | tail -20')
     result = stdout.read().decode().strip()
     print(result)
     
     # 检查环境变量
     print("\n【Selenium 环境变量】")
-    stdin, stdout, stderr = client.exec_command('docker exec selenium-weread-challenge-selenium-muti-user env | grep -i vnc')
+    stdin, stdout, stderr = client.exec_command('docker exec weread-challenge-selenium-muti-user env | grep -i vnc')
     result = stdout.read().decode().strip()
     if result:
         print(result)

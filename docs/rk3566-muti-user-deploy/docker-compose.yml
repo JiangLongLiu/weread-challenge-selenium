@@ -48,7 +48,7 @@ services:
     volumes:
     - ./data/jpx181:/app/data
   selenium:
-    container_name: selenium-weread-challenge-selenium-muti-user
+    container_name: weread-challenge-selenium-muti-user
     environment:
     - SE_ENABLE_TRACING=false
     - SE_BIND_HOST=false

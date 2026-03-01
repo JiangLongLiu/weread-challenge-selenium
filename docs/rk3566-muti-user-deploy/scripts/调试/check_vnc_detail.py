@@ -36,37 +36,37 @@ def main():
     
     # 检查 VNC 启动脚本
     print("\n【1. VNC 启动脚本】")
-    stdin, stdout, stderr = client.exec_command('docker exec selenium-weread-challenge-selenium-muti-user cat /opt/bin/start-vnc.sh 2>/dev/null || echo "文件不存在"')
+    stdin, stdout, stderr = client.exec_command('docker exec weread-challenge-selenium-muti-user cat /opt/bin/start-vnc.sh 2>/dev/null || echo "文件不存在"')
     result = stdout.read().decode().strip()
     print(result[:800] if len(result) > 800 else result)
     
     # 检查 VNC 相关日志
     print("\n【2. VNC 启动日志】")
-    stdin, stdout, stderr = client.exec_command('docker logs selenium-weread-challenge-selenium-muti-user 2>&1 | grep -i vnc | head -20')
+    stdin, stdout, stderr = client.exec_command('docker logs weread-challenge-selenium-muti-user 2>&1 | grep -i vnc | head -20')
     result = stdout.read().decode().strip()
     print(result if result else "无 VNC 日志")
     
     # 检查 5900 相关日志
     print("\n【3. 5900 端口日志】")
-    stdin, stdout, stderr = client.exec_command('docker logs selenium-weread-challenge-selenium-muti-user 2>&1 | grep 5900 | head -10')
+    stdin, stdout, stderr = client.exec_command('docker logs weread-challenge-selenium-muti-user 2>&1 | grep 5900 | head -10')
     result = stdout.read().decode().strip()
     print(result if result else "无 5900 相关日志")
     
     # 检查显示服务器
     print("\n【4. 显示服务器进程】")
-    stdin, stdout, stderr = client.exec_command('docker exec selenium-weread-challenge-selenium-muti-user ps aux | grep -E "Xvfb|display" | grep -v grep')
+    stdin, stdout, stderr = client.exec_command('docker exec weread-challenge-selenium-muti-user ps aux | grep -E "Xvfb|display" | grep -v grep')
     result = stdout.read().decode().strip()
     print(result if result else "无显示服务器进程")
     
     # 检查 DISPLAY 环境变量
     print("\n【5. DISPLAY 环境变量】")
-    stdin, stdout, stderr = client.exec_command('docker exec selenium-weread-challenge-selenium-muti-user env | grep DISPLAY')
+    stdin, stdout, stderr = client.exec_command('docker exec weread-challenge-selenium-muti-user env | grep DISPLAY')
     result = stdout.read().decode().strip()
     print(result if result else "DISPLAY 未设置")
     
     # 检查所有监听端口
     print("\n【6. 所有监听端口】")
-    stdin, stdout, stderr = client.exec_command('docker exec selenium-weread-challenge-selenium-muti-user netstat -tlnp 2>/dev/null || echo "netstat 不可用"')
+    stdin, stdout, stderr = client.exec_command('docker exec weread-challenge-selenium-muti-user netstat -tlnp 2>/dev/null || echo "netstat 不可用"')
     result = stdout.read().decode().strip()
     print(result)
     
