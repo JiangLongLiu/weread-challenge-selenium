@@ -138,6 +138,8 @@ def setup_autostart(ssh):
         '',
         'start() {',
         '    echo "Starting WeRead Selenium..."',
+        '    echo "Waiting 180 seconds for system to stabilize..."',
+        '    sleep 180',
         '    while ! docker ps >/dev/null 2>&1; do',
         '        sleep 2',
         '    done',
@@ -200,7 +202,8 @@ def setup_cron(ssh):
 """.format(dir=REMOTE_DIR)
     
     # 清理旧任务并添加新任务（一次性执行）
-    cmd = f"(crontab -l 2>/dev/null | grep -v 'weread-multi'; echo '{cron_content}') | crontab -"
+    # 过滤掉所有微信读书相关任务：weread-multi、weread、selenium-muti-user、account-4735
+    cmd = f"(crontab -l 2>/dev/null | grep -v -E 'weread|selenium-muti-user|account-4735'; echo '{cron_content}') | crontab -"
     stdin, stdout, stderr = ssh.exec_command(cmd)
     
     # 等待命令完成

@@ -57,13 +57,18 @@ def check_status():
         stdin, stdout, stderr = ssh.exec_command("crontab -l | grep weread-multi")
         result = stdout.read().decode()
         if result:
-            for line in result.strip().split('\n'):
+            lines = result.strip().split('\n')
+            comment_count = sum(1 for line in lines if line.startswith('#'))
+            task_count = sum(1 for line in lines if not line.startswith('#') and line.strip())
+            print(f"  注释行: {comment_count} | 任务行: {task_count} | 总计: {len(lines)}")
+            for line in lines:
                 if line.startswith('#'):
                     print(f"\n{line}")
                 else:
                     parts = line.split()
-                    time_str = f"{parts[0]} {parts[1]} {parts[2]} {parts[3]} {parts[4]}"
-                    print(f"  {time_str}")
+                    if len(parts) >= 5:
+                        time_str = f"{parts[0]} {parts[1]} {parts[2]} {parts[3]} {parts[4]}"
+                        print(f"  {time_str}")
         else:
             print("  无定时任务")
         

@@ -31,7 +31,7 @@ services:
       retries: 10
 
   app-1:
-    image: jqknono/weread-challenge:v0.13.0
+    image: jqknono/weread-challenge:v0.15.0
     pull_policy: never
     network_mode: host
     environment:
@@ -43,7 +43,7 @@ services:
     restart: unless-stopped
 
   app-2:
-    image: jqknono/weread-challenge:v0.13.0
+    image: jqknono/weread-challenge:v0.15.0
     pull_policy: never
     network_mode: host
     environment:
@@ -55,7 +55,7 @@ services:
     restart: unless-stopped
 
   app-3:
-    image: jqknono/weread-challenge:v0.13.0
+    image: jqknono/weread-challenge:v0.15.0
     pull_policy: never
     network_mode: host
     environment:
@@ -67,7 +67,7 @@ services:
     restart: unless-stopped
 
   app-4:
-    image: jqknono/weread-challenge:v0.13.0
+    image: jqknono/weread-challenge:v0.15.0
     pull_policy: never
     network_mode: host
     environment:
