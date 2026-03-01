@@ -64,7 +64,16 @@ rk3566-muti-user-deploy/
     ├── weread-selenium.init   # 开机启动脚本模板
     ├── check_time_and_tasks.py  # 检查时间和定时任务
     ├── debug_app1.py          # 调试 app-1 启动
-    └── pull_image.py          # 拉取 Docker 镜像
+    ├── pull_image.py          # 拉取 Docker 镜像
+    ├── check_vnc.py           # 检查 VNC 服务状态
+    ├── check_vnc_detail.py    # VNC 详细诊断
+    ├── check_xvfb.py          # 检查 Xvfb 启动问题
+    ├── check_xvfb_error.py    # 检查 Xvfb 错误日志
+    ├── check_xvfb_logs.py     # 检查 Xvfb 日志文件
+    ├── test_xvfb.py           # 测试 Xvfb 启动
+    ├── test_xvfb_manual.py    # 手动测试 Xvfb 启动
+    ├── test_xvfb_simple.py    # 简化测试 Xvfb 启动
+    └── check_boot_log.py      # 检查开机启动日志
 ```
 
 ### 远程主机（RK3566）文件
@@ -202,6 +211,18 @@ ls -la /etc/rc.d/S99weread-selenium
 - [scripts/debug_app1.py](scripts/debug_app1.py) - 调试 app-1 启动
 - [scripts/pull_image.py](scripts/pull_image.py) - 拉取 Docker 镜像
 
+### VNC 故障排查脚本
+
+- [scripts/check_vnc.py](scripts/check_vnc.py) - 检查 VNC 服务状态
+- [scripts/check_vnc_detail.py](scripts/check_vnc_detail.py) - VNC 详细诊断
+- [scripts/check_xvfb.py](scripts/check_xvfb.py) - 检查 Xvfb 启动问题
+- [scripts/check_xvfb_error.py](scripts/check_xvfb_error.py) - 检查 Xvfb 错误日志
+- [scripts/check_xvfb_logs.py](scripts/check_xvfb_logs.py) - 检查 Xvfb 日志文件
+- [scripts/test_xvfb.py](scripts/test_xvfb.py) - 测试 Xvfb 启动
+- [scripts/test_xvfb_manual.py](scripts/test_xvfb_manual.py) - 手动测试 Xvfb 启动
+- [scripts/test_xvfb_simple.py](scripts/test_xvfb_simple.py) - 简化测试 Xvfb 启动
+- [scripts/check_boot_log.py](scripts/check_boot_log.py) - 检查开机启动日志
+
 ## 开机启动流程
 
 RK3566 重启后，Selenium 容器通过 OpenWrt 启动脚本自动启动：
@@ -235,6 +256,28 @@ Selenium 运行（restart: unless-stopped 保证异常时重启）
 - **延迟时间**: 180 秒（3分钟）
 - **原因**: RK3566 性能有限，避免开机时 CPU 卡死
 - **配置位置**: `ssh_scp_util.py` 中 `start()` 函数的 `sleep 180`
+
+### X11 清理功能（关键）
+
+开机启动脚本会自动清理旧的 X11 资源，避免 VNC/Xvfb 启动失败：
+
+```bash
+# 清理旧的 X11 socket 和锁文件，避免显示号冲突
+rm -f /tmp/.X*-lock /tmp/.X11-unix/X* 2>/dev/null
+echo "Cleaned up old X11 resources"
+```
+
+**为什么需要清理**：
+- 主机重启后，X11 socket 可能残留，占用显示号
+- 旧容器未正常关闭时，锁文件会阻止新容器启动
+- 之前使用 :99 显示号会冲突，现改为 :98
+
+**验证方法**：
+```bash
+python docs/rk3566-muti-user-deploy/scripts/check_boot_log.py
+```
+
+日志中应显示：`Cleaned up old X11 resources`
 
 ## 定时任务详情
 

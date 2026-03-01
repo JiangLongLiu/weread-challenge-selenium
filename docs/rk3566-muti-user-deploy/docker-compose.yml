@@ -20,6 +20,15 @@ services:
       - SE_NODE_MAX_SESSIONS=10
       - SE_NODE_OVERRIDE_MAX_SESSIONS=true
       - SE_NODE_DISPLAY_NAME="WeRead-MultiUser"
+      - SE_SCREEN_WIDTH=1920
+      - SE_SCREEN_HEIGHT=1080
+      - SE_SCREEN_DEPTH=24
+      - SE_SCREEN_DPI=96
+      - DISPLAY_NUM=98
+      - DISPLAY=:98.0
+      - SE_START_XVFB=true
+      - SE_START_VNC=true
+      - SE_START_NO_VNC=true
       - HTTP_PROXY=
       - HTTPS_PROXY=
       - http_proxy=
