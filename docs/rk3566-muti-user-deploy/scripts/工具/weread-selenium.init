@@ -6,9 +6,16 @@ STOP=10
 
 start() {
     echo "Starting WeRead Selenium..."
+    # 启动 cron 服务
+    /etc/init.d/cron start
+    echo "Waiting 180 seconds for system to stabilize..."
+    sleep 180
     while ! docker ps >/dev/null 2>&1; do
         sleep 2
     done
+    # 清理旧的 X11 socket 和锁文件，避免显示号冲突
+    rm -f /tmp/.X*-lock /tmp/.X11-unix/X* 2>/dev/null
+    echo "Cleaned up old X11 resources"
     cd /mnt/sata1-1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up -d selenium
 }
 
