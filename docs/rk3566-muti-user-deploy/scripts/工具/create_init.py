@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+content = """#!/bin/sh
 # WeRead Selenium Auto Start - 标准 init.d 脚本
 
 NAME="weread-selenium"
@@ -44,3 +46,7 @@ case "$1" in
 esac
 
 exit 0
+"""
+with open(r'e:\Qoder_workspace\weread-challenge-selenium\docs\rk3566-muti-user-deploy\scripts\工具\weread-selenium.init', 'w', encoding='utf-8') as f:
+    f.write(content)
+print('Done')
