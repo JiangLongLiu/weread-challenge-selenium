@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "GrapeCity.gc-excelviewer",
+    "adrianwilczynski.excel-markdown",
+    "tom-phillips.vscode-excel"
+  ],
+  "extensions": {
+    "configurationDefaults": {
+      "files.associations": {
+        "*.xls": "excel",
+        "*.xlsx": "excel"
+      }
+    }
+  }
+}

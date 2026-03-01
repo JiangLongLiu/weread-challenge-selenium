@@ -1,0 +1,10 @@
+{
+  "files.associations": {
+    "*.xls": "GrapeCity.gc-excelviewer",
+    "*.xlsx": "GrapeCity.gc-excelviewer"
+  },
+  "workbench.editorAssociations": {
+    "*.xls": "GrapeCity.gc-excelviewer",
+    "*.xlsx": "GrapeCity.gc-excelviewer"
+  }
+}
