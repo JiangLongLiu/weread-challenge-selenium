@@ -165,26 +165,150 @@ python docs/rk3566-oect-2-fnOS-deploy/scripts/ssh_scp_util.py
 ### 管理开机启动
 
 ```bash
-# 查看开机启动脚本
-cat /etc/init.d/weread-selenium
-
-# 查看开机链接
-ls -la /etc/rc.d/S99weread-selenium
+# 查看 systemd 服务文件
+cat /etc/systemd/system/weread-selenium.service
 
 # 手动启用开机启动
-/etc/init.d/weread-selenium enable
+systemctl enable weread-selenium.service
 
 # 手动禁用开机启动
-/etc/init.d/weread-selenium disable
+systemctl disable weread-selenium.service
 
-# 手动启动（带180秒延迟）
-/etc/init.d/weread-selenium start
+# 手动启动（带 180 秒延迟）
+systemctl start weread-selenium.service
 
 # 手动停止
-/etc/init.d/weread-selenium stop
+systemctl stop weread-selenium.service
 
 # 查看状态
-/etc/init.d/weread-selenium status
+systemctl status weread-selenium.service
+
+# 查看启动日志
+journalctl -u weread-selenium.service -f
+```
+
+### 暂时关闭随机启动和定时任务
+
+**场景：** 临时维护、调试或需要完全停止自动启动时
+
+**方法 1：使用自动化脚本（推荐）**
+
+```bash
+# 1. 禁用 systemd 服务（删除冲突的 SysV 脚本）
+python docs/rk3566-oect-2-fnOS-deploy/scripts/disable-52-systemd-complete.py
+
+# 2. 清理定时任务
+python docs/rk3566-oect-2-fnOS-deploy/scripts/clear-52-crontab.py
+```
+
+**方法 2：手动操作**
+
+```bash
+# 1. 禁用 systemd 服务
+systemctl disable weread-selenium.service
+systemctl stop weread-selenium.service
+
+# 2. 删除冲突的 SysV 脚本（如果存在）
+rm -f /etc/init.d/weread-selenium
+rm -f /etc/rc.d/S99weread-selenium
+systemctl daemon-reload
+
+# 3. 备份并清理定时任务
+crontab -l > /tmp/crontab_backup_$(date +%Y%m%d_%H%M%S).txt
+crontab -l | grep -v -E "weread|selenium|app-" | crontab -
+```
+
+**验证关闭状态：**
+```bash
+# 检查 systemd 服务状态
+systemctl is-enabled weread-selenium.service  # 应显示 disabled
+
+# 检查定时任务
+crontab -l | grep weread-multi  # 应无输出
+```
+
+### 恢复随机启动和定时任务
+
+**场景：** 维护完成后，需要恢复自动启动功能时
+
+**方法 1：恢复定时任务**
+
+```bash
+# 从备份恢复定时任务
+crontab /tmp/crontab_backup_*.txt
+
+# 或者重新部署（推荐，确保配置最新）
+python docs/rk3566-oect-2-fnOS-deploy/scripts/ssh_scp_util.py
+```
+
+**方法 2：恢复 systemd 服务**
+
+```bash
+# 1. 重新启用 systemd 服务
+systemctl enable weread-selenium.service
+systemctl start weread-selenium.service
+
+# 2. 验证服务状态
+systemctl status weread-selenium.service  # 应显示 enabled 和 active (exited)
+
+# 3. 查看启动日志
+journalctl -u weread-selenium.service -f
+```
+
+**验证恢复状态：**
+```bash
+# 检查 systemd 服务状态
+systemctl is-enabled weread-selenium.service  # 应显示 enabled
+
+# 检查定时任务
+crontab -l | grep weread-multi  # 应显示 17 个任务
+
+# 检查容器状态
+cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user
+docker compose ps  # Selenium 容器应运行中
+```
+
+### 完整关闭流程示例
+
+```bash
+# 步骤 1: 禁用 systemd 服务
+python docs/rk3566-oect-2-fnOS-deploy/scripts/disable-52-systemd-complete.py
+
+# 步骤 2: 清理定时任务
+python docs/rk3566-oect-2-fnOS-deploy/scripts/clear-52-crontab.py
+
+# 步骤 3: 停止所有容器
+cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user
+docker compose down
+
+# 步骤 4: 验证
+systemctl is-enabled weread-selenium.service  # disabled
+crontab -l | grep weread  # 无输出
+docker ps | grep weread  # 无输出
+```
+
+### 完整恢复流程示例
+
+```bash
+# 步骤 1: 重新部署（推荐，包含所有配置）
+python docs/rk3566-oect-2-fnOS-deploy/scripts/ssh_scp_util.py
+
+# 或者手动恢复：
+# 步骤 1: 恢复 systemd 服务
+systemctl enable weread-selenium.service
+systemctl start weread-selenium.service
+
+# 步骤 2: 恢复定时任务（如果之前备份了）
+crontab /tmp/crontab_backup_*.txt
+
+# 步骤 3: 启动 Selenium 容器
+cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user
+docker compose up -d selenium
+
+# 步骤 4: 验证
+systemctl status weread-selenium.service  # active (exited)
+crontab -l | grep weread-multi  # 17 个任务
+docker compose ps  # Selenium 运行中
 ```
 
 ## 注意事项
@@ -206,10 +330,17 @@ ls -la /etc/rc.d/S99weread-selenium
 - [scripts/ssh_scp_util.py](scripts/ssh_scp_util.py) - 自动化部署脚本
 - [scripts/check-status.py](scripts/check-status.py) - 状态检查脚本
 - [scripts/start_selenium.py](scripts/start_selenium.py) - 手动启动 Selenium
-- [scripts/weread-selenium.init](scripts/weread-selenium.init) - 开机启动脚本模板
 - [scripts/工具/check_time_and_tasks.py](scripts/工具/check_time_and_tasks.py) - 检查时间和定时任务
 - [scripts/调试/debug_app1.py](scripts/调试/debug_app1.py) - 调试 app-1 启动
 - [scripts/工具/pull_image.py](scripts/工具/pull_image.py) - 拉取 Docker 镜像
+
+### systemd 服务管理脚本
+
+- [scripts/disable-52-systemd.py](scripts/disable-52-systemd.py) - 暂时关闭 systemd 服务
+- [scripts/disable-52-systemd-complete.py](scripts/disable-52-systemd-complete.py) - 完全关闭 systemd 服务（删除 SysV 脚本）
+- [scripts/clear-52-crontab.py](scripts/clear-52-crontab.py) - 清理定时任务（删除 weread 相关任务）
+- [scripts/工具/weread-selenium.service](scripts/工具/weread-selenium.service) - systemd 服务文件模板
+- [scripts/工具/setup-autostart.sh](scripts/工具/setup-autostart.sh) - 开机自启动设置脚本
 
 ### VNC 故障排查脚本
 
