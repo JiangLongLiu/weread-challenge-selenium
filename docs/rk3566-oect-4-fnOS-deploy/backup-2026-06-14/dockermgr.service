@@ -1,0 +1,14 @@
+[Unit]
+Description=trim docker management service
+After=docker.service
+After=trim_main.service
+
+[Service]
+Type=simple
+ExecStartPre=/bin/sleep 5
+ExecStart=/usr/trim/bin/dockermgr
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

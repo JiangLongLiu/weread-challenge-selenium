@@ -1,0 +1,22 @@
+cat > /tmp/weread-crontab << 'CRONTAB_EOF'
+# === weread-multi: selenium lifecycle ===
+25 2 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up selenium -d
+35 5 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose stop app-1 app-2 2>/dev/null; docker compose stop selenium
+
+# === weread-multi: liujl4735 (app-1) 02:30-04:00 ===
+30 2 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up app-1 -d && (sleep 5400 && docker compose stop app-1) &
+
+# === weread-multi: transition 04:01-04:02 ===
+1 4 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker restart weread-challenge-selenium-muti-user
+2 4 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up app-2 -d && (sleep 5280 && docker compose stop app-2) &
+
+# === weread-multi: reboot recovery ===
+@reboot /bin/bash -c 'H=$(date +\%H); M=$(date +\%M); T=$((H*60+M)); if [ $T -ge 145 ] && [ $T -le 335 ]; then cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up selenium -d && sleep 30 && if [ $T -lt 240 ]; then docker compose up app-1 -d; elif [ $T -ge 242 ]; then docker compose up app-2 -d; fi; fi'
+
+# === weread-multi: daily cleanup ===
+59 23 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && find data -name screenshot-*.png -delete && find data -name output.log -delete
+
+# system logrotate
+*/30 * * * * /usr/sbin/logrotate /etc/logrotate.d/rsyslog > /dev/null 2>&1
+CRONTAB_EOF
+crontab /tmp/weread-crontab && echo 'OK: crontab installed' && crontab -l

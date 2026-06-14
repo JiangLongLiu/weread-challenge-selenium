@@ -1,0 +1,28 @@
+# crontab 备份 — 192.168.1.54 (RK3566-OECT1-4-fnOS)
+# 备份时间: 2026-06-14
+# 来源: crontab -l
+
+*/30 * * * * /usr/sbin/logrotate /etc/logrotate.d/rsyslog > /dev/null 2>&1
+
+# weread-multi: liujl4735
+0 0 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up app-1 -d && (sleep 4200 && docker compose stop app-1 && docker restart weread-challenge-selenium-muti-user) &
+0 6 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up app-1 -d && (sleep 4200 && docker compose stop app-1 && docker restart weread-challenge-selenium-muti-user) &
+0 13 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up app-1 -d && (sleep 4200 && docker compose stop app-1 && docker restart weread-challenge-selenium-muti-user) &
+0 19 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up app-1 -d && (sleep 4200 && docker compose stop app-1 && docker restart weread-challenge-selenium-muti-user) &
+# weread-multi: liujl3016
+10 1 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up app-2 -d && (sleep 4200 && docker compose stop app-2 && docker restart weread-challenge-selenium-muti-user) &
+10 7 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up app-2 -d && (sleep 4200 && docker compose stop app-2 && docker restart weread-challenge-selenium-muti-user) &
+10 14 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up app-2 -d && (sleep 4200 && docker compose stop app-2 && docker restart weread-challenge-selenium-muti-user) &
+10 20 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up app-2 -d && (sleep 4200 && docker compose stop app-2 && docker restart weread-challenge-selenium-muti-user) &
+# weread-multi: jpx155
+20 2 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up app-3 -d && (sleep 4200 && docker compose stop app-3 && docker restart weread-challenge-selenium-muti-user) &
+20 8 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up app-3 -d && (sleep 4200 && docker compose stop app-3 && docker restart weread-challenge-selenium-muti-user) &
+20 15 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up app-3 -d && (sleep 4200 && docker compose stop app-3 && docker restart weread-challenge-selenium-muti-user) &
+20 21 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up app-3 -d && (sleep 4200 && docker compose stop app-3 && docker restart weread-challenge-selenium-muti-user) &
+# weread-multi: jpx181
+30 3 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up app-4 -d && (sleep 4200 && docker compose stop app-4 && docker restart weread-challenge-selenium-muti-user) &
+30 9 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up app-4 -d && (sleep 4200 && docker compose stop app-4 && docker restart weread-challenge-selenium-muti-user) &
+30 16 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up app-4 -d && (sleep 4200 && docker compose stop app-4 && docker restart weread-challenge-selenium-muti-user) &
+30 22 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && docker compose up app-4 -d && (sleep 4200 && docker compose stop app-4 && docker restart weread-challenge-selenium-muti-user) &
+# weread-multi: daily cleanup (screenshots and logs)
+59 23 * * * cd /vol1/docker/mycontainers/weread-challenge-selenium-muti-user && find data -name screenshot-*.png -delete && find data -name output.log -delete
